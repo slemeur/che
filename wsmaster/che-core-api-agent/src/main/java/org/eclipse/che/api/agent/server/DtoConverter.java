@@ -10,20 +10,25 @@
  *******************************************************************************/
 package org.eclipse.che.api.agent.server;
 
-import com.google.inject.AbstractModule;
+import org.eclipse.che.api.agent.shared.dto.AgentDto;
+import org.eclipse.che.api.agent.shared.model.Agent;
 
-import org.eclipse.che.api.agent.server.impl.RemoteAgentRegistryUrlProvider;
-import org.eclipse.che.api.agent.server.impl.RemoteAgentRegistryImpl;
-import org.eclipse.che.api.agent.server.impl.RemoteRemoteAgentRegistryUrlProviderImpl;
+import static org.eclipse.che.dto.server.DtoFactory.newDto;
 
 /**
  * @author Anatolii Bazko
  */
-public class AgentModule extends AbstractModule {
-    @Override
-    protected void configure() {
-        bind(RemoteAgentRegistryUrlProvider.class).to(RemoteRemoteAgentRegistryUrlProviderImpl.class);
-        bind(AgentRegistry.class).to(RemoteAgentRegistryImpl.class);
-        bind(AgentService.class);
+public class DtoConverter {
+
+    public static AgentDto asDto(Agent agent) {
+        AgentDto agentDto = newDto(AgentDto.class);
+        agentDto.setName(agent.getName());
+        agentDto.setVersion(agent.getVersion());
+        agentDto.setProperties(agent.getProperties());
+        agentDto.setScript(agent.getScript());
+        agentDto.setDependencies(agent.getDependencies());
+        return agentDto;
     }
+
+    private DtoConverter() { }
 }

@@ -20,7 +20,7 @@ import java.util.Map;
  * @author Anatoliy Bazko
  */
 @DTO
-public interface AgentgDto extends Agent {
+public interface AgentDto extends Agent {
     String getName();
 
     void setName(String name);

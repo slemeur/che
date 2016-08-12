@@ -28,12 +28,20 @@ import org.eclipse.che.api.machine.server.exception.MachineException;
 import org.eclipse.che.api.machine.server.model.impl.CommandImpl;
 import org.eclipse.che.api.machine.server.spi.Instance;
 import org.eclipse.che.api.machine.server.spi.InstanceProcess;
+import org.eclipse.che.plugin.docker.client.json.ContainerConfig;
+import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
+import static com.google.common.base.Strings.isNullOrEmpty;
 import static java.lang.String.format;
 
 /**
@@ -41,8 +49,7 @@ import static java.lang.String.format;
  */
 @Singleton
 public class DockerAgentsApplier {
-
-    private static final org.slf4j.Logger LOG = LoggerFactory.getLogger(DockerAgentsApplier.class);
+    private static final Logger LOG = LoggerFactory.getLogger(DockerAgentsApplier.class);
 
     private final AgentRegistry agentRegistry;
 
@@ -51,38 +58,60 @@ public class DockerAgentsApplier {
         this.agentRegistry = agentRegistry;
     }
 
-    /**
-     * Applies agents {@link MachineConfig#getAgents()} over machine instance.
-     * Respects dependencies between agents.
-     */
-    public void apply(Instance machine) throws MachineException {
-        HashSet<String> agentsCompleted = new HashSet<>();
-        HashSet<String> agentsInProgress = new HashSet<>();
+    public void applyOn(ContainerConfig containerConfig, MachineConfig machineConfig) throws MachineException {
+        List<Agent> agents = sortAgents(machineConfig);
+        for (Agent agent : agents) {
+            addExposedPorts(containerConfig, agent);
+        }
+    }
 
-        for (String agentKey : machine.getConfig().getAgents()) {
-            apply(machine, AgentKeyImpl.of(agentKey), agentsCompleted, agentsInProgress);
+    private void addExposedPorts(ContainerConfig containerConfig, Agent agent) {
+        Map<String, String> properties = agent.getProperties();
+
+        String ports = properties.get(PROPERTIES.PORTS.toString());
+        if (!isNullOrEmpty(ports)) {
+            for (String port : ports.split(",")) {
+                String[] items = port.split(":"); // ref:port
+                if (items.length == 1) {
+                    containerConfig.getExposedPorts().put(items[0], Collections.emptyMap());
+                } else {
+                    containerConfig.getExposedPorts().put(items[1], Collections.emptyMap());
+                }
+            }
         }
     }
 
     /**
-     * @param machine
-     *      the machine instance
-     * @param agentKey
-     *      the agent to be applied
-     * @param agentsCompleted
-     *      completed agents, to avoid applying the same agent twice
-     * @param agentsInProgress
-     *      pending agents to apply, to avoid circular dependency
+     * Applies agents {@link MachineConfig#getAgents()} over machine instance.
+     * Respects dependencies between agents.
      */
-    private void apply(Instance machine,
-                       AgentKey agentKey,
-                       Set<String> agentsCompleted,
-                       Set<String> agentsInProgress) throws MachineException {
-        if (agentsCompleted.contains(agentKey.getName())) {
+    public void applyOn(Instance machine, MachineConfig machineConfig) throws MachineException {
+        List<Agent> agents = sortAgents(machineConfig);
+        for (Agent agent : agents) {
+            LOG.info("Starting {} agent", agent.getName());
+            startAgent(machine, new CommandImpl(agent.getName(), agent.getScript(), "agent"));
+        }
+    }
+
+    protected List<Agent> sortAgents(MachineConfig machineConfig) throws MachineException {
+        Map<String, Agent> sorted = new HashMap<>();
+        Set<String> pending = new HashSet<>();
+
+        for (String agentKey : machineConfig.getAgents()) {
+            doSortAgents(AgentKeyImpl.parse(agentKey), sorted, pending);
+        }
+//        doSortAgents(AgentKeyImpl.parse("org.eclipse.che.terminal"), sorted, pending);
+
+        return new ArrayList<>(sorted.values());
+    }
+
+    private void doSortAgents(AgentKey agentKey, Map<String, Agent> sorted, Set<String> pending) throws MachineException {
+        String agentName = agentKey.getName();
+
+        if (sorted.containsKey(agentName)) {
             return;
         }
-
-        if (!agentsInProgress.add(agentKey.getName())) {
+        if (!pending.add(agentName)) {
             throw new MachineException("Agents circular dependency found.");
         }
 
@@ -94,33 +123,58 @@ public class DockerAgentsApplier {
         }
 
         for (String dependency : agent.getDependencies()) {
-            apply(machine, AgentKeyImpl.of(dependency), agentsCompleted, agentsInProgress);
+            doSortAgents(AgentKeyImpl.parse(dependency), sorted, pending);
         }
 
-        LOG.info("Starting {} agent", agentKey.toString());
-        startProcess(machine, new CommandImpl(agentKey.toString(), agent.getScript(), "agent"));
-
-        agentsInProgress.remove(agentKey.getName());
-        agentsCompleted.add(agentKey.getName());
+        sorted.put(agentName, agent);
+        pending.remove(agentName);
     }
 
-    private void startProcess(Instance machine, Command command) throws MachineException {
-        ErrorConsumer statusDetector = new ErrorConsumer();
+    private void startAgent(Instance machine, Command command) throws MachineException {
+        final ErrorConsumer errorConsumer = new ErrorConsumer(new AbstractLineConsumer() {
+            @Override
+            public void writeLine(String line) throws IOException {
+                machine.getLogger().writeLine(format("Agent %s error: %s", command.getName(), line));
+            }
+        });
 
-        InstanceProcess process = machine.createProcess(command, null);
-        try {
-            process.start(new CompositeLineConsumer(statusDetector, new AbstractLineConsumer() {
-                @Override
-                public void writeLine(String line) throws IOException {
-                    LOG.debug(line);
+        Thread thread = new Thread("Agent " + command.getName()) {
+            @Override
+            public void run() {
+                try {
+                    final InstanceProcess process = machine.createProcess(command, command.getName());
+                    process.start(new CompositeLineConsumer(errorConsumer, new AbstractLineConsumer() {
+                        @Override
+                        public void writeLine(String line) throws IOException {
+                            LOG.debug(line);
+                        }
+                    }));
+                } catch (ConflictException | MachineException e) {
+                    try {
+                        machine.getLogger().writeLine(format("Agent %s error: %s", command.getName(), e.getMessage()));
+                    } catch (IOException e1) {
+                        // ignore
+                    }
                 }
-            }));
-        } catch (ConflictException e) {
-            throw new MachineException("Can't start process with command: " + command, e);
+            }
+        };
+        thread.setDaemon(true);
+        thread.start();
+    }
+
+    enum PROPERTIES {
+        PORTS("ports");
+
+        private final String value;
+
+        PROPERTIES(String value) {
+            this.value = value;
         }
 
-        if (statusDetector.hasError()) {
-            throw new MachineException(format("Agent %s failed: %s", command.getName(), statusDetector.getError()));
+        @Override
+        public String toString() {
+            return value;
         }
     }
 }
+

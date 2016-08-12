@@ -336,7 +336,7 @@ public class DockerInstanceProvider implements InstanceProvider {
                                            machine,
                                            imageName,
                                            creationLogsOutput);
-        dockerAgentsApplier.apply(instance);
+        dockerAgentsApplier.applyOn(instance, config);
         return instance;
     }
 
@@ -560,6 +560,7 @@ public class DockerInstanceProvider implements InstanceProvider {
                                                                 .withHostConfig(hostConfig)
                                                                 .withEnv(env.toArray(new String[env.size()]));
 
+            dockerAgentsApplier.applyOn(config, machine.getConfig());
             final String containerId = docker.createContainer(CreateContainerParams.create(config)
                                                                                    .withContainerName(containerName))
                                                                                    .getId();

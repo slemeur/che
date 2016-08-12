@@ -15,8 +15,6 @@ import com.google.inject.multibindings.Multibinder;
 import com.google.inject.name.Names;
 
 import org.eclipse.che.api.core.model.machine.ServerConf;
-import org.eclipse.che.api.machine.server.terminal.MachineImplSpecificTerminalLauncher;
-import org.eclipse.che.plugin.docker.machine.DockerMachineImplTerminalLauncher;
 import org.eclipse.che.plugin.docker.machine.ext.provider.TerminalServerConfProvider;
 
 /**
@@ -32,13 +30,5 @@ public class DockerTerminalModule extends AbstractModule {
                                                                           ServerConf.class,
                                                                           Names.named("machine.docker.machine_servers"));
         machineServers.addBinding().toProvider(TerminalServerConfProvider.class);
-
-        Multibinder<String> volumesMultibinder =
-                Multibinder.newSetBinder(binder(), String.class, Names.named("machine.docker.machine_volumes"));
-        volumesMultibinder.addBinding().toProvider(org.eclipse.che.plugin.docker.machine.ext.provider.TerminalVolumeProvider.class);
-
-        Multibinder<MachineImplSpecificTerminalLauncher> terminalLaunchers = Multibinder.newSetBinder(binder(),
-                                                                                                      MachineImplSpecificTerminalLauncher.class);
-        terminalLaunchers.addBinding().to(DockerMachineImplTerminalLauncher.class);
     }
 }

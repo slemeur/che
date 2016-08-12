@@ -37,7 +37,6 @@ public interface AgentRegistry {
      */
     Agent createAgent(String name, String version) throws AgentException;
 
-
     /**
      * Creates {@link Agent}.
      *

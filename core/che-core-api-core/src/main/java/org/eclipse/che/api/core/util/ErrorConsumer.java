@@ -10,52 +10,49 @@
  *******************************************************************************/
 package org.eclipse.che.api.core.util;
 
-import com.google.common.base.Joiner;
-
 import java.io.IOException;
-import java.util.LinkedList;
-import java.util.List;
+
+import static org.eclipse.che.api.core.util.ErrorConsumer.ErrorIndicator.DEFAULT_ERROR_INDICATOR;
 
 /**
+ * Consumes all output and redirect to another consumer
+ * only those lines which contain errors.
+ *
  * @author Anatolii Bazko
  */
 public class ErrorConsumer implements LineConsumer {
 
     private final ErrorIndicator errorIndicator;
-    private final List<String>   errors;
+    private final LineConsumer   lineConsumer;
 
-    public ErrorConsumer(ErrorIndicator errorIndicator) {
+    public ErrorConsumer(ErrorIndicator errorIndicator, LineConsumer lineConsumer) {
         this.errorIndicator = errorIndicator;
-        this.errors = new LinkedList<>();
+        this.lineConsumer = lineConsumer;
     }
 
-    public ErrorConsumer() {
-        this(line -> line.contains("[STDERR]"));
-    }
-
-    public boolean hasError() {
-        return !errors.isEmpty();
-    }
-
-    public String getError() {
-        return Joiner.on("\n").join(errors);
+    public ErrorConsumer(LineConsumer lineConsumer) {
+        this(DEFAULT_ERROR_INDICATOR, lineConsumer);
     }
 
     @Override
     public void writeLine(String line) throws IOException {
         if (errorIndicator.isError(line)) {
-            errors.add(line);
+            lineConsumer.writeLine(line);
         }
     }
 
     @Override
-    public void close() throws IOException { }
+    public void close() throws IOException {
+        lineConsumer.close();
+    }
 
     /**
-     * Indicates if line is a error message.
+     * Indicates if line contains a error message.
      */
     @FunctionalInterface
     public interface ErrorIndicator {
         boolean isError(String line);
+
+        ErrorIndicator DEFAULT_ERROR_INDICATOR = line -> line.contains("[STDERR]");
     }
 }

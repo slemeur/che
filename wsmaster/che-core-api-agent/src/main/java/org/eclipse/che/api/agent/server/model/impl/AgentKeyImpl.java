@@ -42,7 +42,7 @@ public class AgentKeyImpl implements AgentKey {
      * @throws IllegalArgumentException
      *      in case of wrong format
      */
-    public static AgentKeyImpl of(String agentKey) throws IllegalArgumentException {
+    public static AgentKeyImpl parse(String agentKey) throws IllegalArgumentException {
         String[] parts = agentKey.split(":");
 
         if (parts.length == 1) {

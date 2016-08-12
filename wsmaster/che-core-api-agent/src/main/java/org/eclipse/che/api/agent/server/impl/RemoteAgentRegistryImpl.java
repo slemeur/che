@@ -17,7 +17,7 @@ import com.google.inject.Singleton;
 import org.eclipse.che.api.agent.server.AgentRegistry;
 import org.eclipse.che.api.agent.server.exception.AgentException;
 import org.eclipse.che.api.agent.server.exception.AgentNotFoundException;
-import org.eclipse.che.api.agent.shared.dto.AgentgDto;
+import org.eclipse.che.api.agent.shared.dto.AgentDto;
 import org.eclipse.che.api.agent.shared.model.Agent;
 import org.eclipse.che.api.agent.shared.model.AgentKey;
 import org.eclipse.che.api.core.BadRequestException;
@@ -95,7 +95,7 @@ public class RemoteAgentRegistryImpl implements AgentRegistry {
         try {
             File agent = downloadFile(new File(System.getProperty("java.io.tmpdir")), "agent", ".tmp", url);
             String json = readAndCloseQuietly(new FileInputStream(agent));
-            return DtoFactory.getInstance().createDtoFromJson(json, AgentgDto.class);
+            return DtoFactory.getInstance().createDtoFromJson(json, AgentDto.class);
         } catch (IOException | IllegalArgumentException e) {
             throw new AgentException("Can't fetch agent configuration", e);
         }

@@ -10,32 +10,29 @@
  *******************************************************************************/
 package org.eclipse.che.api.core.util;
 
-import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 
 /**
  * @author Anatolii Bazko
  */
 public class ErrorConsumerTest {
-    private ErrorConsumer errorDetector;
-
-    @BeforeMethod
-    public void setUp() throws Exception {
-        errorDetector = new ErrorConsumer();
-    }
 
     @Test
-    public void shouldHaveError() throws Exception {
-        errorDetector.writeLine("Line 1");
-        errorDetector.writeLine("Line 2");
-        errorDetector.writeLine("[STDERR] Line 3");
-        errorDetector.writeLine("[STDERR] Line 4");
-        errorDetector.writeLine("Line 5");
+    public void testRedirect() throws Exception {
+        LineConsumer lineConsumer = mock(LineConsumer.class);
 
-        assertTrue(errorDetector.hasError());
-        assertEquals(errorDetector.getError(), "[STDERR] Line 3\n[STDERR] Line 4");
+        ErrorConsumer errorConsumer = new ErrorConsumer(lineConsumer);
+
+        errorConsumer.writeLine("Line 1");
+        errorConsumer.writeLine("Line 2");
+        errorConsumer.writeLine("[STDERR] Line 3");
+        errorConsumer.writeLine("[STDERR] Line 4");
+        errorConsumer.writeLine("Line 5");
+
+        verify(lineConsumer).writeLine("[STDERR] Line 3");
+        verify(lineConsumer).writeLine("[STDERR] Line 4");
     }
 }
