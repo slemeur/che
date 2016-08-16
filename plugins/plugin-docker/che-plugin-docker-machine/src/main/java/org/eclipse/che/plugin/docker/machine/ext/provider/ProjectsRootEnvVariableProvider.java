@@ -10,8 +10,6 @@
  *******************************************************************************/
 package org.eclipse.che.plugin.docker.machine.ext.provider;
 
-import org.eclipse.che.plugin.docker.machine.DockerInstanceRuntimeInfo;
-
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
@@ -30,6 +28,6 @@ public class ProjectsRootEnvVariableProvider implements Provider<String> {
 
     @Override
     public String get() {
-        return DockerInstanceRuntimeInfo.PROJECTS_ROOT_VARIABLE + '=' + projectFolderPath;
+        return projectFolderPath;
     }
 }

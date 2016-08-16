@@ -21,7 +21,6 @@ import org.eclipse.che.api.machine.server.spi.Instance;
 import org.eclipse.che.api.machine.server.spi.InstanceProcess;
 import org.eclipse.che.plugin.docker.client.json.ContainerConfig;
 import org.mockito.ArgumentCaptor;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
@@ -65,11 +64,15 @@ public class DockerAgentsApplierTest {
     private Agent               agent3;
     @Mock
     private InstanceProcess     instanceProcess;
-    @InjectMocks
+    @Mock
+    private Map<String, String> conf;
+
     private DockerAgentsApplier dockerAgentsApplier;
 
     @BeforeMethod
     public void setUp() throws Exception {
+        dockerAgentsApplier = new DockerAgentsApplier(conf, agentRegistry);
+
         when(machine.getConfig()).thenReturn(machineConfig);
         when(machine.createProcess(any(), any())).thenReturn(instanceProcess);
 
@@ -80,11 +83,9 @@ public class DockerAgentsApplierTest {
         when(agentRegistry.createAgent(eq(AgentKeyImpl.parse("fqn3")))).thenReturn(agent3);
 
         when(agent1.getScript()).thenReturn("script1");
-        when(agent1.getProperties()).thenReturn(singletonMap("ports", "terminal:1111/udp,terminal:2222/tcp"));
         when(agent1.getDependencies()).thenReturn(singletonList("fqn3"));
 
         when(agent2.getScript()).thenReturn("script2");
-        when(agent2.getProperties()).thenReturn(singletonMap("ports", "3333/udp"));
         when(agent2.getDependencies()).thenReturn(singletonList("fqn3"));
 
         when(agent3.getScript()).thenReturn("script3");
@@ -93,9 +94,11 @@ public class DockerAgentsApplierTest {
 
     @Test
     public void shouldAddExposedPorts() throws Exception {
+        when(agent1.getProperties()).thenReturn(singletonMap("ports", "terminal:1111/udp,terminal:2222/tcp"));
+        when(agent2.getProperties()).thenReturn(singletonMap("ports", "3333/udp"));
         ContainerConfig containerConfig = new ContainerConfig();
 
-        dockerAgentsApplier.applyOn(containerConfig, machineConfig);
+        dockerAgentsApplier.applyOn(containerConfig, machineConfig.getAgents());
 
         Map<String, Map<String, String>> exposedPorts = containerConfig.getExposedPorts();
         assertTrue(exposedPorts.containsKey("1111/udp"));
@@ -103,11 +106,64 @@ public class DockerAgentsApplierTest {
         assertTrue(exposedPorts.containsKey("3333/udp"));
     }
 
-//    @Test
+    @Test
+    public void shouldAddEnvVariables() throws Exception {
+        when(agent1.getProperties()).thenReturn(singletonMap("environment", "p1=v1,p2=v2"));
+        when(agent2.getProperties()).thenReturn(singletonMap("environment", "p3=v3"));
+        ContainerConfig containerConfig = new ContainerConfig();
+
+        dockerAgentsApplier.applyOn(containerConfig, machineConfig.getAgents());
+
+        String[] env = containerConfig.getEnv();
+        assertEquals(env.length, 3);
+        assertEquals(env[0], "p1=v1");
+        assertEquals(env[1], "p2=v2");
+        assertEquals(env[2], "p3=v3");
+    }
+
+    @Test
+    public void shouldAddEnvironmentVariableValueFromConfiguration() throws Exception {
+        when(agent1.getProperties()).thenReturn(singletonMap("environment", "p1=${v_template}"));
+        when(conf.get("v_template")).thenReturn("v1");
+
+        ContainerConfig containerConfig = new ContainerConfig();
+
+        dockerAgentsApplier.applyOn(containerConfig, machineConfig.getAgents());
+
+        String[] env = containerConfig.getEnv();
+        assertEquals(env.length, 1);
+        assertEquals(env[0], "p1=v1");
+    }
+
+    @Test
+    public void shouldIgnoreEnvironmentVariableIfValueNotFoundInConfiguration() throws Exception {
+        when(agent1.getProperties()).thenReturn(singletonMap("environment", "p1=${v_template}"));
+
+        ContainerConfig containerConfig = new ContainerConfig();
+
+        dockerAgentsApplier.applyOn(containerConfig, machineConfig.getAgents());
+
+        String[] env = containerConfig.getEnv();
+        assertEquals(env.length, 0);
+    }
+
+    @Test
+    public void shouldIgnoreEnvironmentIfIllegalFormat() throws Exception {
+        when(agent1.getProperties()).thenReturn(singletonMap("environment", "p1"));
+
+        ContainerConfig containerConfig = new ContainerConfig();
+
+        dockerAgentsApplier.applyOn(containerConfig, machineConfig.getAgents());
+
+        String[] env = containerConfig.getEnv();
+        assertEquals(env.length, 0);
+    }
+
+    //    @Test
     public void shouldRespectDependencies() throws Exception {
         ArgumentCaptor<Command> command = ArgumentCaptor.forClass(Command.class);
 
-        dockerAgentsApplier.applyOn(machine, machineConfig);
+        dockerAgentsApplier.applyOn(machine, machineConfig.getAgents());
 
         verify(machine, times(3)).createProcess(command.capture(), any());
 
@@ -123,7 +179,7 @@ public class DockerAgentsApplierTest {
         when(agent1.getDependencies()).thenReturn(singletonList("fqn2"));
         when(agent2.getDependencies()).thenReturn(singletonList("fqn1"));
 
-        dockerAgentsApplier.applyOn(machine, machineConfig);
+        dockerAgentsApplier.applyOn(machine, machineConfig.getAgents());
     }
 
 //    @Test(expectedExceptions = MachineException.class, expectedExceptionsMessageRegExp = ".*Agent error.*")
@@ -137,6 +193,6 @@ public class DockerAgentsApplierTest {
             }
         }).when(instanceProcess).start(any(LineConsumer.class));
 
-        dockerAgentsApplier.applyOn(machine, machineConfig);
+        dockerAgentsApplier.applyOn(machine, machineConfig.getAgents());
     }
 }

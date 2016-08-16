@@ -8,26 +8,13 @@
  * Contributors:
  *   Codenvy, S.A. - initial API and implementation
  *******************************************************************************/
-package org.eclipse.che.plugin.docker.machine.ext.provider;
+package org.eclipse.che.api.agent.server;
 
-import javax.inject.Inject;
-import javax.inject.Named;
+
 import javax.inject.Provider;
-import javax.inject.Singleton;
 
 /**
- * Add env variable to docker dev-machine with java opts
- *
- * @author Roman Iuvshyn
+ * @author Anatolii Bazko
  */
-@Singleton
-public class JavaOptsEnvVariableProvider implements Provider<String> {
-    @Inject
-    @Named("che.machine.java_opts")
-    private String javaOpts;
-
-    @Override
-    public String get() {
-        return javaOpts;
-    }
+public interface AgentProvider extends Provider<String> {
 }

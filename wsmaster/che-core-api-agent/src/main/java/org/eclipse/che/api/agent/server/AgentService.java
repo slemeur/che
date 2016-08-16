@@ -28,6 +28,7 @@ import org.eclipse.che.api.core.rest.Service;
 import org.eclipse.che.dto.server.JsonArrayImpl;
 
 import javax.ws.rs.GET;
+import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
@@ -60,7 +61,7 @@ public class AgentService extends Service {
         this.agentRegistry = agentRegistry;
     }
 
-    @GET
+    @POST
     @Path("{name}")
     @Produces(APPLICATION_JSON)
     @ApiOperation(value = "Create a new agent", response = AgentDto.class)
@@ -78,7 +79,7 @@ public class AgentService extends Service {
         }
     }
 
-    @GET
+    @POST
     @Path("{name}/{version}")
     @Produces(APPLICATION_JSON)
     @ApiOperation(value = "Create a new agent", response = AgentDto.class)
@@ -116,4 +117,13 @@ public class AgentService extends Service {
         }
     }
 
+    @GET
+    @Produces(APPLICATION_JSON)
+    @ApiOperation(value = "Get a list of the available agents", response = List.class)
+    @ApiResponses({@ApiResponse(code = 200, message = "OK"),
+                   @ApiResponse(code = 500, message = "Internal server error occurred")})
+    public Response getAgents() throws ServerException {
+        Collection<String> versions = agentRegistry.getAgents();
+        return Response.status(Response.Status.OK).entity(new JsonArrayImpl<>(new ArrayList<>(versions))).build();
+    }
 }
