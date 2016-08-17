@@ -28,7 +28,6 @@ import org.eclipse.che.api.machine.server.exception.MachineException;
 import org.eclipse.che.api.machine.server.model.impl.CommandImpl;
 import org.eclipse.che.api.machine.server.spi.Instance;
 import org.eclipse.che.api.machine.server.spi.InstanceProcess;
-import org.eclipse.che.ide.util.Arrays;
 import org.eclipse.che.plugin.docker.client.json.ContainerConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -86,7 +85,7 @@ public class DockerAgentsApplier implements AgentsApplier {
         }
 
         List<String> newEnv = new LinkedList<>();
-        if (!Arrays.isNullOrEmpty(containerConfig.getEnv())) {
+        if (containerConfig.getEnv() != null) {
             newEnv.addAll(asList(containerConfig.getEnv()));
         }
 
@@ -134,7 +133,6 @@ public class DockerAgentsApplier implements AgentsApplier {
         }
     }
 
-
     @Override
     public void applyOn(Instance machine, List<String> agentKeys) throws MachineException {
         List<Agent> agents = sortAgents(agentKeys);
@@ -151,7 +149,7 @@ public class DockerAgentsApplier implements AgentsApplier {
         for (String agentKey : agentKeys) {
             doSortAgents(AgentKeyImpl.parse(agentKey), sorted, pending);
         }
-//        doSortAgents(AgentKeyImpl.parse("org.eclipse.che.terminal"), sorted, pending);
+        doSortAgents(AgentKeyImpl.parse("org.eclipse.che.ws-agent"), sorted, pending);
 
         return new ArrayList<>(sorted.values());
     }
@@ -197,7 +195,7 @@ public class DockerAgentsApplier implements AgentsApplier {
                     process.start(new CompositeLineConsumer(errorConsumer, new AbstractLineConsumer() {
                         @Override
                         public void writeLine(String line) throws IOException {
-                            LOG.debug(line);
+                            LOG.info(line);
                         }
                     }));
                 } catch (ConflictException | MachineException e) {
@@ -209,8 +207,7 @@ public class DockerAgentsApplier implements AgentsApplier {
                 }
             }
         };
-        thread.setDaemon(true);
-        thread.start();
+        thread.run();
     }
 
     enum PROPERTIES {

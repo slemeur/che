@@ -14,8 +14,6 @@ import com.google.inject.AbstractModule;
 import com.google.inject.multibindings.MapBinder;
 import com.google.inject.name.Names;
 
-import org.eclipse.che.plugin.docker.machine.DockerInstanceRuntimeInfo;
-
 /**
  * Guice module for extension servers feature in docker machines
  *
@@ -31,11 +29,11 @@ public class DockerExtServerModule extends AbstractModule {
                                                                       String.class, Names.named("machine.docker.machine_env"))
                                                         .permitDuplicates();
 
-        machineEnv.addBinding(DockerInstanceRuntimeInfo.API_ENDPOINT_URL_VARIABLE)
+        machineEnv.addBinding("machine.docker.che_api.endpoint")
                   .toProvider(org.eclipse.che.plugin.docker.machine.ext.provider.ApiEndpointEnvVariableProvider.class);
-        machineEnv.addBinding(DockerInstanceRuntimeInfo.PROJECTS_ROOT_VARIABLE)
+        machineEnv.addBinding("che.machine.projects.internal.storage")
                   .toProvider(org.eclipse.che.plugin.docker.machine.ext.provider.ProjectsRootEnvVariableProvider.class);
-        machineEnv.addBinding(DockerInstanceRuntimeInfo.JAVA_OPTS_VARIABLE)
+        machineEnv.addBinding("che.machine.java_opts")
                   .toProvider(org.eclipse.che.plugin.docker.machine.ext.provider.JavaOptsEnvVariableProvider.class);
 
     }

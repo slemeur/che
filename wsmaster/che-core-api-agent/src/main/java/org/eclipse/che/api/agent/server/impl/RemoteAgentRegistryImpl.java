@@ -14,7 +14,6 @@ import com.google.common.reflect.TypeToken;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
-import org.eclipse.che.api.agent.server.AgentProvider;
 import org.eclipse.che.api.agent.server.AgentRegistry;
 import org.eclipse.che.api.agent.server.exception.AgentException;
 import org.eclipse.che.api.agent.server.exception.AgentNotFoundException;
@@ -36,9 +35,9 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.URL;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import static java.lang.String.format;
 import static org.eclipse.che.commons.lang.IoUtil.downloadFile;
@@ -51,15 +50,15 @@ import static org.eclipse.che.commons.lang.IoUtil.readAndCloseQuietly;
 public class RemoteAgentRegistryImpl implements AgentRegistry {
     private final RemoteAgentRegistryUrlProvider urlProvider;
     private final HttpJsonRequestFactory         requestFactory;
-    private final Set<AgentProvider>             providers;
+//    private final Set<AgentProvider>             providers;
 
     @Inject
-    public RemoteAgentRegistryImpl(Set<AgentProvider> providers,
+    public RemoteAgentRegistryImpl(/*Set<AgentProvider> providers,*/
                                    RemoteAgentRegistryUrlProvider urlProvider,
                                    HttpJsonRequestFactory requestFactory) {
         this.urlProvider = urlProvider;
         this.requestFactory = requestFactory;
-        this.providers = providers;
+//        this.providers = providers;
     }
 
     @Override
@@ -111,6 +110,7 @@ public class RemoteAgentRegistryImpl implements AgentRegistry {
 
     @Override
     public Set<String> getAgents() {
-        return providers.stream().map(AgentProvider::get).collect(Collectors.toSet());
+//        return providers.stream().map(AgentProvider::get).collect(Collectors.toSet());
+        return Collections.emptySet();
     }
 }

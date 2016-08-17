@@ -51,7 +51,7 @@ public class WsAgentLauncherImpl implements WsAgentLauncher {
 
     private final Provider<MachineManager> machineManagerProvider;
     private final HttpJsonRequestFactory   httpJsonRequestFactory;
-    private final String                   wsAgentStartCommandLine;
+//    private final String                   wsAgentStartCommandLine;
     private final long                     wsAgentMaxStartTimeMs;
     private final long                     wsAgentPingDelayMs;
     private final int                      wsAgentPingConnectionTimeoutMs;
@@ -60,14 +60,14 @@ public class WsAgentLauncherImpl implements WsAgentLauncher {
     @Inject
     public WsAgentLauncherImpl(Provider<MachineManager> machineManagerProvider,
                                HttpJsonRequestFactory httpJsonRequestFactory,
-                               @Named(WS_AGENT_PROCESS_START_COMMAND) String wsAgentStartCommandLine,
+//                               @Named(WS_AGENT_PROCESS_START_COMMAND) String wsAgentStartCommandLine,
                                @Named("machine.ws_agent.max_start_time_ms") long wsAgentMaxStartTimeMs,
                                @Named("machine.ws_agent.ping_delay_ms") long wsAgentPingDelayMs,
                                @Named("machine.ws_agent.ping_conn_timeout_ms") int wsAgentPingConnectionTimeoutMs,
                                @Named("machine.ws_agent.ping_timed_out_error_msg") String pingTimedOutErrorMessage) {
         this.machineManagerProvider = machineManagerProvider;
         this.httpJsonRequestFactory = httpJsonRequestFactory;
-        this.wsAgentStartCommandLine = wsAgentStartCommandLine;
+//        this.wsAgentStartCommandLine = wsAgentStartCommandLine;
         this.wsAgentMaxStartTimeMs = wsAgentMaxStartTimeMs;
         this.wsAgentPingDelayMs = wsAgentPingDelayMs;
         this.wsAgentPingConnectionTimeoutMs = wsAgentPingConnectionTimeoutMs;
@@ -85,7 +85,7 @@ public class WsAgentLauncherImpl implements WsAgentLauncher {
         final String wsAgentPingUrl = wsAgentPingRequest.getUrl();
         try {
             getMachineManager().exec(devMachine.getId(),
-                                     new CommandImpl(WS_AGENT_PROCESS_NAME, wsAgentStartCommandLine, "Arbitrary"),
+                                     new CommandImpl(WS_AGENT_PROCESS_NAME, "JPDA_ADDRESS=4403 && $HOME/che/ws-agent/bin/catalina.sh jpda run", "Arbitrary"),
                                      getWsAgentProcessOutputChannel(workspaceId));
             final long pingStartTimestamp = System.currentTimeMillis();
             LOG.debug("Starts pinging ws agent. Workspace ID:{}. Url:{}. Timestamp:{}",

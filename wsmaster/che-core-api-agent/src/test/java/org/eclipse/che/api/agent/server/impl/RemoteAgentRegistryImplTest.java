@@ -43,7 +43,6 @@ import java.util.Set;
 
 import static java.lang.String.format;
 import static java.nio.file.Files.copy;
-import static java.util.Collections.singleton;
 import static java.util.Collections.singletonList;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.when;
@@ -68,7 +67,7 @@ public class RemoteAgentRegistryImplTest {
     public void setUp(ITestContext context) throws Exception {
         when(agentProvider.get()).thenReturn("name1");
 
-        agentRegistry = new RemoteAgentRegistryImpl(singleton(agentProvider), urlProvider, new DefaultHttpJsonRequestFactory());
+        agentRegistry = new RemoteAgentRegistryImpl(/*singleton(agentProvider), */urlProvider, new DefaultHttpJsonRequestFactory());
 
         final Object port = context.getAttribute(EverrestJetty.JETTY_PORT);
         when(urlProvider.getAgentUrl(anyString())).thenAnswer(new Answer<URL>() {
