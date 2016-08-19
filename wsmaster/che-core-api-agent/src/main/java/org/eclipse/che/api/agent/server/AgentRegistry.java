@@ -17,7 +17,6 @@ import org.eclipse.che.api.agent.shared.model.AgentKey;
 
 import java.net.URL;
 import java.util.Collection;
-import java.util.Set;
 
 /**
  * @author Anatoliy Bazko
@@ -88,9 +87,4 @@ public interface AgentRegistry {
      *      if unexpected error occurred
      */
     Collection<String> getVersions(String name) throws AgentException;
-
-    /**
-     * @return available agents names.
-     */
-    Set<String> getAgents();
 }

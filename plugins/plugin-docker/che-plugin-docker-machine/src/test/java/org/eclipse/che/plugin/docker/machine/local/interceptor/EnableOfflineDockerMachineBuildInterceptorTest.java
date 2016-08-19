@@ -13,12 +13,15 @@ package org.eclipse.che.plugin.docker.machine.local.interceptor;
 import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
+import com.google.inject.multibindings.Multibinder;
 import com.google.inject.name.Names;
 import com.google.inject.spi.ConstructorBinding;
 
 import org.aopalliance.intercept.MethodInvocation;
 import org.eclipse.che.api.core.model.machine.MachineConfig;
 import org.eclipse.che.api.core.model.machine.Recipe;
+import org.eclipse.che.api.machine.server.dao.SnapshotDao;
+import org.eclipse.che.api.machine.server.spi.InstanceProvider;
 import org.eclipse.che.api.machine.server.util.RecipeDownloader;
 import org.eclipse.che.api.machine.server.util.RecipeRetriever;
 import org.eclipse.che.api.workspace.server.WorkspaceManager;
@@ -52,9 +55,9 @@ import static org.testng.Assert.assertEquals;
 
 @Listeners(MockitoTestNGListener.class)
 public class EnableOfflineDockerMachineBuildInterceptorTest {
-    private static final String REPO  = "some/image";
-    private static final String TAG   = "tag1";
-    private static final String IMAGE = REPO + ":" + TAG;
+    private static final String REPO               = "some/image";
+    private static final String TAG                = "tag1";
+    private static final String IMAGE              = REPO + ":" + TAG;
     private static final String MACHINE_IMAGE_NAME = "machineImageName";
 
     @Mock
@@ -78,7 +81,7 @@ public class EnableOfflineDockerMachineBuildInterceptorTest {
     @Mock
     private Supplier<Boolean>                             doForcePullOnBuildFlagProvider;
     @Mock
-    private DockerAgentsApplier                           dockerAgentsApplier;
+    private DockerAgentsApplier                           agentsApplier;
 
 
     private DockerInstanceProvider                     dockerInstanceProvider;
@@ -183,6 +186,7 @@ public class EnableOfflineDockerMachineBuildInterceptorTest {
         @Override
         protected void configure() {
             bind(DockerInstanceProvider.class);
+            bind(DockerAgentsApplier.class).toInstance(agentsApplier);
             bind(DockerConnector.class).toInstance(dockerConnector);
             bind(UserSpecificDockerRegistryCredentialsProvider.class).toInstance(dockerCredentials);
             bind(WorkspaceFolderPathProvider.class).to(LocalWorkspaceFolderPathProvider.class);
@@ -190,7 +194,13 @@ public class EnableOfflineDockerMachineBuildInterceptorTest {
             bind(WorkspaceManager.class).toInstance(workspaceManager);
             bind(RecipeRetriever.class).toInstance(recipeRetriever);
             bind(RecipeDownloader.class).toInstance(mock(RecipeDownloader.class));
-            bind(DockerAgentsApplier.class).toInstance(dockerAgentsApplier);
+            bind(SnapshotDao.class).toInstance(mock(SnapshotDao.class));
+            Multibinder<InstanceProvider> machineImageProviderMultibinder =
+                    Multibinder.newSetBinder(binder(),
+                                             org.eclipse.che.api.machine.server.spi.InstanceProvider.class);
+            machineImageProviderMultibinder.addBinding()
+                                           .to(org.eclipse.che.plugin.docker.machine.DockerInstanceProvider.class);
+
 
             bindConstant().annotatedWith(Names.named("machine.docker.privilege_mode")).to(false);
             bindConstant().annotatedWith(Names.named("machine.docker.pull_image")).to(true);
@@ -199,6 +209,8 @@ public class EnableOfflineDockerMachineBuildInterceptorTest {
             bindConstant().annotatedWith(Names.named("che.machine.projects.internal.storage")).to("/tmp");
             bindConstant().annotatedWith(Names.named("machine.docker.machine_extra_hosts")).to("");
             bindConstant().annotatedWith(Names.named("che.workspace.storage")).to("/tmp");
+            bindConstant().annotatedWith(Names.named("machine.default_mem_size_mb")).to("1024");
+            bindConstant().annotatedWith(Names.named("machine.logs.location")).to("/tmp");
             install(new DockerMachineModule());
 
             install(new AllowOfflineMachineCreationModule());

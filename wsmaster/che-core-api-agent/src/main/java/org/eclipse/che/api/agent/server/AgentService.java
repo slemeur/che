@@ -116,14 +116,4 @@ public class AgentService extends Service {
             throw new ServerException(e.getMessage());
         }
     }
-
-    @GET
-    @Produces(APPLICATION_JSON)
-    @ApiOperation(value = "Get a list of the available agents", response = List.class)
-    @ApiResponses({@ApiResponse(code = 200, message = "OK"),
-                   @ApiResponse(code = 500, message = "Internal server error occurred")})
-    public Response getAgents() throws ServerException {
-        Collection<String> versions = agentRegistry.getAgents();
-        return Response.status(Response.Status.OK).entity(new JsonArrayImpl<>(new ArrayList<>(versions))).build();
-    }
 }

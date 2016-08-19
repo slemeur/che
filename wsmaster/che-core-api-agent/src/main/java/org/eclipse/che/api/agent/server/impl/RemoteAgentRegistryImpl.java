@@ -35,9 +35,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.URL;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
-import java.util.Set;
 
 import static java.lang.String.format;
 import static org.eclipse.che.commons.lang.IoUtil.downloadFile;
@@ -50,15 +48,12 @@ import static org.eclipse.che.commons.lang.IoUtil.readAndCloseQuietly;
 public class RemoteAgentRegistryImpl implements AgentRegistry {
     private final RemoteAgentRegistryUrlProvider urlProvider;
     private final HttpJsonRequestFactory         requestFactory;
-//    private final Set<AgentProvider>             providers;
 
     @Inject
-    public RemoteAgentRegistryImpl(/*Set<AgentProvider> providers,*/
-                                   RemoteAgentRegistryUrlProvider urlProvider,
+    public RemoteAgentRegistryImpl(RemoteAgentRegistryUrlProvider urlProvider,
                                    HttpJsonRequestFactory requestFactory) {
         this.urlProvider = urlProvider;
         this.requestFactory = requestFactory;
-//        this.providers = providers;
     }
 
     @Override
@@ -106,11 +101,5 @@ public class RemoteAgentRegistryImpl implements AgentRegistry {
         } catch (IOException | IllegalArgumentException e) {
             throw new AgentException("Can't fetch agent configuration", e);
         }
-    }
-
-    @Override
-    public Set<String> getAgents() {
-//        return providers.stream().map(AgentProvider::get).collect(Collectors.toSet());
-        return Collections.emptySet();
     }
 }

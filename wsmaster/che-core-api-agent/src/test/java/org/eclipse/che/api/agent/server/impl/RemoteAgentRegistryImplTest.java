@@ -10,7 +10,6 @@
  *******************************************************************************/
 package org.eclipse.che.api.agent.server.impl;
 
-import org.eclipse.che.api.agent.server.AgentProvider;
 import org.eclipse.che.api.agent.server.exception.AgentException;
 import org.eclipse.che.api.agent.server.exception.AgentNotFoundException;
 import org.eclipse.che.api.agent.shared.model.Agent;
@@ -39,7 +38,6 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.Collection;
-import java.util.Set;
 
 import static java.lang.String.format;
 import static java.nio.file.Files.copy;
@@ -59,14 +57,10 @@ public class RemoteAgentRegistryImplTest {
     private RegistryService                service;
     @Mock
     private RemoteAgentRegistryUrlProvider urlProvider;
-    @Mock
-    private AgentProvider                  agentProvider;
     private RemoteAgentRegistryImpl        agentRegistry;
 
     @BeforeMethod
     public void setUp(ITestContext context) throws Exception {
-        when(agentProvider.get()).thenReturn("name1");
-
         agentRegistry = new RemoteAgentRegistryImpl(/*singleton(agentProvider), */urlProvider, new DefaultHttpJsonRequestFactory());
 
         final Object port = context.getAttribute(EverrestJetty.JETTY_PORT);
@@ -129,14 +123,6 @@ public class RemoteAgentRegistryImplTest {
     @Test(expectedExceptions = AgentNotFoundException.class)
     public void testGetAgentsVersionShouldFailsIfAgentUnknown() throws Exception {
         agentRegistry.getVersions("terminal");
-    }
-
-    @Test
-    public void testGetAvailableAgents() throws Exception {
-        Set<String> agents = agentRegistry.getAgents();
-
-        assertEquals(agents.size(), 1);
-        assertTrue(agents.contains("name1"));
     }
 
     @Path("registry")
