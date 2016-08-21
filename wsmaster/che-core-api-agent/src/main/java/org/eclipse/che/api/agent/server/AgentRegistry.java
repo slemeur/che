@@ -15,7 +15,6 @@ import org.eclipse.che.api.agent.server.exception.AgentNotFoundException;
 import org.eclipse.che.api.agent.shared.model.Agent;
 import org.eclipse.che.api.agent.shared.model.AgentKey;
 
-import java.net.URL;
 import java.util.Collection;
 
 /**
@@ -52,28 +51,19 @@ public interface AgentRegistry {
     Agent createAgent(AgentKey agentKey) throws AgentException;
 
     /**
-     * Creates the {@link Agent} of the latest version.
+     * Creates the {@link Agent} by its name or by url.
+     * In case of name the latest version of the agent will be created.
+     * In case of url the agent will be retrieved by specific url.
      *
      * @param name
-     *      the name of the agent
+     *      the name of the agent or url
      * @return {@link Agent}
      * @throws AgentNotFoundException
-     *      if agent not found in the registry
+     *      if agent not found
      * @throws AgentException
      *      if agent can't be created or other unexpected error occurred
      */
     Agent createAgent(String name) throws AgentException;
-
-    /**
-     * Creates the {@link Agent}.
-     *
-     * @param url
-     *      the url to agent
-     * @return {@link Agent}
-     * @throws AgentException
-     *      if agent can't be created or other unexpected error occurred
-     */
-    Agent createAgent(URL url) throws AgentException;
 
     /**
      * Returns a list of the available versions of the specific agent.

@@ -61,7 +61,7 @@ public class RemoteAgentRegistryImplTest {
 
     @BeforeMethod
     public void setUp(ITestContext context) throws Exception {
-        agentRegistry = new RemoteAgentRegistryImpl(/*singleton(agentProvider), */urlProvider, new DefaultHttpJsonRequestFactory());
+        agentRegistry = new RemoteAgentRegistryImpl(urlProvider, new DefaultHttpJsonRequestFactory());
 
         final Object port = context.getAttribute(EverrestJetty.JETTY_PORT);
         when(urlProvider.getAgentUrl(anyString())).thenAnswer(new Answer<URL>() {
@@ -91,7 +91,25 @@ public class RemoteAgentRegistryImplTest {
     }
 
     @Test
-    public void testGetSpecificVersionAgent() throws Exception {
+    public void testCreateLatestVersionAgentByUrl(ITestContext context) throws Exception {
+        final Object port = context.getAttribute(EverrestJetty.JETTY_PORT);
+        Agent agent = agentRegistry.createAgent("http://localhost:" + port + "/rest/registry/agent/ws-agent");
+
+        assertEquals(agent.getName(), "ws-agent");
+        assertEquals(agent.getVersion(), "2.0");
+    }
+
+    @Test
+    public void testCreateSpecificVersionAgentByUrl(ITestContext context) throws Exception {
+        final Object port = context.getAttribute(EverrestJetty.JETTY_PORT);
+        Agent agent = agentRegistry.createAgent("http://localhost:" + port + "/rest/registry/agent/ws-agent/1.0");
+
+        assertEquals(agent.getName(), "ws-agent");
+        assertEquals(agent.getVersion(), "1.0");
+    }
+
+    @Test
+    public void testCreateSpecificVersionAgent() throws Exception {
         Agent agent = agentRegistry.createAgent("ws-agent", "1.0");
 
         assertEquals(agent.getName(), "ws-agent");
@@ -99,7 +117,7 @@ public class RemoteAgentRegistryImplTest {
     }
 
     @Test
-    public void testGetLatestVersionAgent() throws Exception {
+    public void testCreateLatestVersionAgent() throws Exception {
         Agent agent = agentRegistry.createAgent("ws-agent");
 
         assertEquals(agent.getName(), "ws-agent");

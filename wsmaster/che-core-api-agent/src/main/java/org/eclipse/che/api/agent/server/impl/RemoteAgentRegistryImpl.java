@@ -33,6 +33,7 @@ import org.eclipse.che.dto.server.DtoFactory;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Collection;
 import java.util.List;
@@ -71,7 +72,17 @@ public class RemoteAgentRegistryImpl implements AgentRegistry {
 
     @Override
     public Agent createAgent(String name) throws AgentException {
-        URL url = urlProvider.getAgentUrl(name);
+        URL url;
+        if (name.startsWith("http")) {
+            try {
+                url = new URL(name);
+            } catch (MalformedURLException e) {
+                throw new AgentException("Malformed agent url " + name, e);
+            }
+        } else {
+            url = urlProvider.getAgentUrl(name);
+        }
+
         return createAgent(url);
     }
 
@@ -92,8 +103,7 @@ public class RemoteAgentRegistryImpl implements AgentRegistry {
         }
     }
 
-    @Override
-    public Agent createAgent(URL url) throws AgentException {
+    protected Agent createAgent(URL url) throws AgentException {
         try {
             File agent = downloadFile(new File(System.getProperty("java.io.tmpdir")), "agent", ".tmp", url);
             String json = readAndCloseQuietly(new FileInputStream(agent));
