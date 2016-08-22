@@ -28,19 +28,20 @@ import static java.lang.String.format;
 public abstract class AbstractAgentLauncher implements AgentLauncher {
 
     protected void waitForProcessIsRun(Instance machine, Agent agent, String processName) throws MachineException {
-        ListLineConsumer lineConsumer = new ListLineConsumer();
-        Command command = new CommandImpl("Wait for " + agent.getName(), format("pidof %s", processName), "test");
+        Command command = new CommandImpl("Wait for " + agent.getName(), format("ps -fC %s 1>/dev/null && echo 0 || echo 1", processName), "test");
 
         for (; ; ) {
+            ListLineConsumer lineConsumer = new ListLineConsumer();
             InstanceProcess process = machine.createProcess(command, null);
             try {
                 process.start(lineConsumer);
+                if (lineConsumer.getText().equals("[STDOUT] 0")) {
+                    break;
+                }
             } catch (ConflictException ignored) {
                 // never should happen
-            }
-
-            if (!lineConsumer.getText().isEmpty()) {
-                break;
+            } finally {
+                lineConsumer.close();
             }
 
             try {

@@ -9,12 +9,11 @@
 #   Codenvy, S.A. - initial API and implementation
 #
 
-pidof che-websocket-terminal && exit
-
 unset PACKAGES
 unset SUDO
 command -v tar >/dev/null 2>&1 || { PACKAGES=${PACKAGES}" tar"; }
 command -v wget >/dev/null 2>&1 || { PACKAGES=${PACKAGES}" wget"; }
+command -v ps >/dev/null 2>&1 || { PACKAGES=${PACKAGES}" ps"; }
 test "$(id -u)" = 0 || SUDO="sudo"
 
 CHE_DIR=$HOME/che
@@ -55,7 +54,7 @@ elif echo ${LINUX_TYPE} | grep -qi "debian"; then
 ###########
 elif echo ${LINUX_TYPE} | grep -qi "fedora"; then
     test "${PACKAGES}" = "" || {
-        ${SUDO} yum -y install ${PACKAGES};
+        ${SUDO} dnf install ${PACKAGES};
     }
 
 # CentOS 7.1 & Oracle Linux 7.1
@@ -85,6 +84,8 @@ else
     >&2 cat /etc/os-release
     exit 1
 fi
+
+ps -fC che-websocket-terminal && exit
 
 ########################
 ### Install Terminal ###

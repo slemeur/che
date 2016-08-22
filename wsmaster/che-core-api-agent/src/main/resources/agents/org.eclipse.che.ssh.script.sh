@@ -9,8 +9,6 @@
 #   Codenvy, S.A. - initial API and implementation
 #
 
-pidof sshd && exit
-
 unset SUDO
 test "$(id -u)" = 0 || SUDO="sudo"
 
@@ -84,6 +82,8 @@ else
     >&2 cat /etc/os-release
     exit 1
 fi
+
+ps -fC sshd && exit
 
 ${SUDO} mkdir -p /var/run/sshd
 ${SUDO} /usr/bin/ssh-keygen -A && ${SUDO} /usr/sbin/sshd -D
