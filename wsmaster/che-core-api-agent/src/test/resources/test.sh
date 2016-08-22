@@ -16,18 +16,18 @@
 ${CHE_PATH}/che.sh --debug start
 sleep 20s
 
-DOCKER_CONTENT=("FROM opensuse:13.2\nCMD tail -f /dev/null"
-                "FROM debian:8\nCMD tail -f /dev/null"
-                "FROM fedora:23\nCMD tail -f /dev/null"
+DOCKER_CONTENT=("FROM fedora:23\nCMD tail -f /dev/null"
                 "FROM alpine:3.3\nCMD tail -f /dev/null"
                 "FROM ubuntu:16.04\nCMD tail -f /dev/null"
                 "FROM ubuntu:14.04\nCMD tail -f /dev/null"
-                "FROM centos:7\nCMD tail -f /dev/null");
+                "FROM centos:7\nCMD tail -f /dev/null"
+                "FROM opensuse:13.2\nCMD tail -f /dev/null"
+                "FROM debian:8\nCMD tail -f /dev/null");
 
 waitStatus() {
     WORKSPACE_ID=$1
     STATUS=$2
-    ATTEMPTS=100
+    ATTEMPTS=200
 
     for ((j = 0; j < ${ATTEMPTS}; j++))
     do

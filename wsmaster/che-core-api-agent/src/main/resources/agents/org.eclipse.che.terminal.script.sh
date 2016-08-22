@@ -13,7 +13,6 @@ unset PACKAGES
 unset SUDO
 command -v tar >/dev/null 2>&1 || { PACKAGES=${PACKAGES}" tar"; }
 command -v wget >/dev/null 2>&1 || { PACKAGES=${PACKAGES}" wget"; }
-command -v ps >/dev/null 2>&1 || { PACKAGES=${PACKAGES}" ps"; }
 test "$(id -u)" = 0 || SUDO="sudo"
 
 CHE_DIR=$HOME/che
@@ -53,8 +52,9 @@ elif echo ${LINUX_TYPE} | grep -qi "debian"; then
 # Fedora 23 
 ###########
 elif echo ${LINUX_TYPE} | grep -qi "fedora"; then
+    PACKAGES=${PACKAGES}" procps-ng"
     test "${PACKAGES}" = "" || {
-        ${SUDO} dnf install ${PACKAGES};
+        ${SUDO} dnf -y install ${PACKAGES};
     }
 
 # CentOS 7.1 & Oracle Linux 7.1

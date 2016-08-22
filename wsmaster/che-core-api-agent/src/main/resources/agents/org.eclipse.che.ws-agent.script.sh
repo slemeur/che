@@ -54,8 +54,9 @@ elif echo ${LINUX_TYPE} | grep -qi "debian"; then
 # Fedora 23
 ###########
 elif echo ${LINUX_TYPE} | grep -qi "fedora"; then
+    PACKAGES=${PACKAGES}" procps-ng"
     test "${PACKAGES}" = "" || {
-        ${SUDO} yum -y install ${PACKAGES};
+        ${SUDO} dnf -y install ${PACKAGES};
     }
 
 # CentOS 7.1 & Oracle Linux 7.1
