@@ -12,9 +12,8 @@ package org.eclipse.che.api.agent.server;
 
 import com.google.inject.AbstractModule;
 
-import org.eclipse.che.api.agent.server.impl.RemoteAgentRegistryUrlProvider;
-import org.eclipse.che.api.agent.server.impl.RemoteAgentRegistryImpl;
-import org.eclipse.che.api.agent.server.impl.RemoteRemoteAgentRegistryUrlProviderImpl;
+import org.eclipse.che.api.agent.server.impl.AgentRegistryImpl;
+import org.eclipse.che.api.agent.server.impl.AgentRegistryUrlProviderImpl;
 
 /**
  * @author Anatolii Bazko
@@ -22,8 +21,8 @@ import org.eclipse.che.api.agent.server.impl.RemoteRemoteAgentRegistryUrlProvide
 public class AgentModule extends AbstractModule {
     @Override
     protected void configure() {
-        bind(RemoteAgentRegistryUrlProvider.class).to(RemoteRemoteAgentRegistryUrlProviderImpl.class);
-        bind(AgentRegistry.class).to(RemoteAgentRegistryImpl.class);
+        bind(AgentRegistryUrlProvider.class).to(AgentRegistryUrlProviderImpl.class);
+        bind(AgentRegistry.class).to(AgentRegistryImpl.class);
         bind(AgentService.class);
     }
 }

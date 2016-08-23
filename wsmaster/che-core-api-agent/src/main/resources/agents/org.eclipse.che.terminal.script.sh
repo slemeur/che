@@ -12,7 +12,7 @@
 unset PACKAGES
 unset SUDO
 command -v tar >/dev/null 2>&1 || { PACKAGES=${PACKAGES}" tar"; }
-command -v wget >/dev/null 2>&1 || { PACKAGES=${PACKAGES}" wget"; }
+command -v wget >/dev/null 2>&1 || { PACKAGES=${PACKAGES}" curl"; }
 test "$(id -u)" = 0 || SUDO="sudo"
 
 CHE_DIR=$HOME/che
@@ -104,5 +104,5 @@ else
     exit 1
 fi
 
-wget  -qO - https://codenvy.com/update/repository/public/download/org.eclipse.che.terminal.binaries.${PREFIX} | tar -C ${CHE_DIR} -xzf -
+curl -s  https://codenvy.com/update/repository/public/download/org.eclipse.che.terminal.binaries.${PREFIX} | tar  xzf - -C ${CHE_DIR}
 $HOME/che/terminal/che-websocket-terminal -addr :4411 -cmd /bin/bash -static $HOME/che/terminal/

@@ -10,6 +10,7 @@
  *******************************************************************************/
 package org.eclipse.che.api.agent.server.impl;
 
+import org.eclipse.che.api.agent.server.AgentRegistryUrlProvider;
 import org.eclipse.che.api.agent.server.exception.AgentException;
 import org.eclipse.che.api.agent.server.exception.AgentNotFoundException;
 import org.eclipse.che.api.agent.shared.model.Agent;
@@ -51,17 +52,17 @@ import static org.testng.Assert.assertTrue;
  * @author Anatoliy Bazko
  */
 @Listeners(value = {EverrestJetty.class, MockitoTestNGListener.class})
-public class RemoteAgentRegistryImplTest {
+public class AgentRegistryImplTest {
 
     @SuppressWarnings("unused")
-    private RegistryService                service;
+    private RegistryService          service;
     @Mock
-    private RemoteAgentRegistryUrlProvider urlProvider;
-    private RemoteAgentRegistryImpl        agentRegistry;
+    private AgentRegistryUrlProvider urlProvider;
+    private AgentRegistryImpl        agentRegistry;
 
     @BeforeMethod
     public void setUp(ITestContext context) throws Exception {
-        agentRegistry = new RemoteAgentRegistryImpl(urlProvider, new DefaultHttpJsonRequestFactory());
+        agentRegistry = new AgentRegistryImpl(urlProvider, new DefaultHttpJsonRequestFactory());
 
         final Object port = context.getAttribute(EverrestJetty.JETTY_PORT);
         when(urlProvider.getAgentUrl(anyString())).thenAnswer(new Answer<URL>() {

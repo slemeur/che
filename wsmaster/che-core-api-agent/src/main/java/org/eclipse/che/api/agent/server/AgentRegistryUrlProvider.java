@@ -8,7 +8,7 @@
  * Contributors:
  *   Codenvy, S.A. - initial API and implementation
  *******************************************************************************/
-package org.eclipse.che.api.agent.server.impl;
+package org.eclipse.che.api.agent.server;
 
 import org.eclipse.che.api.agent.server.exception.AgentException;
 
@@ -17,7 +17,7 @@ import java.net.URL;
 /**
  * @author Anatolii Bazko
  */
-public interface RemoteAgentRegistryUrlProvider {
+public interface AgentRegistryUrlProvider {
     /**
      * Returns url to download agent of the specific version.
      *

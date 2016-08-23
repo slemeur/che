@@ -13,6 +13,7 @@ package org.eclipse.che.api.agent.server.impl;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
+import org.eclipse.che.api.agent.server.AgentRegistryUrlProvider;
 import org.eclipse.che.api.agent.server.exception.AgentException;
 
 import java.net.MalformedURLException;
@@ -26,12 +27,12 @@ import static java.lang.String.format;
  * @author Anatolii Bazko
  */
 @Singleton
-public class RemoteRemoteAgentRegistryUrlProviderImpl implements RemoteAgentRegistryUrlProvider {
+public class AgentRegistryUrlProviderImpl implements AgentRegistryUrlProvider {
 
     public static final String BASE_URL = "https://codenvy.com/update/repository/";
 
     @Inject
-    public RemoteRemoteAgentRegistryUrlProviderImpl() { }
+    public AgentRegistryUrlProviderImpl() { }
 
     @Override
     public URL getAgentUrl(String name, String version) throws AgentException {

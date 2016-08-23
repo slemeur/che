@@ -15,6 +15,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
 import org.eclipse.che.api.agent.server.AgentRegistry;
+import org.eclipse.che.api.agent.server.AgentRegistryUrlProvider;
 import org.eclipse.che.api.agent.server.exception.AgentException;
 import org.eclipse.che.api.agent.server.exception.AgentNotFoundException;
 import org.eclipse.che.api.agent.shared.dto.AgentDto;
@@ -46,13 +47,13 @@ import static org.eclipse.che.commons.lang.IoUtil.readAndCloseQuietly;
  * @author Anatoliy Bazko
  */
 @Singleton
-public class RemoteAgentRegistryImpl implements AgentRegistry {
-    private final RemoteAgentRegistryUrlProvider urlProvider;
-    private final HttpJsonRequestFactory         requestFactory;
+public class AgentRegistryImpl implements AgentRegistry {
+    private final AgentRegistryUrlProvider urlProvider;
+    private final HttpJsonRequestFactory   requestFactory;
 
     @Inject
-    public RemoteAgentRegistryImpl(RemoteAgentRegistryUrlProvider urlProvider,
-                                   HttpJsonRequestFactory requestFactory) {
+    public AgentRegistryImpl(AgentRegistryUrlProvider urlProvider,
+                             HttpJsonRequestFactory requestFactory) {
         this.urlProvider = urlProvider;
         this.requestFactory = requestFactory;
     }
