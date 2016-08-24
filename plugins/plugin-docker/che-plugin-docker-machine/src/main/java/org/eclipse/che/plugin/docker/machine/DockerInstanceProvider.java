@@ -125,7 +125,7 @@ public class DockerInstanceProvider implements InstanceProvider {
     private final DockerContainerNameGenerator                  containerNameGenerator;
     private final RecipeRetriever                               recipeRetriever;
     private final WorkspaceFolderPathProvider                   workspaceFolderPathProvider;
-    private final DockerAgentsApplier                           dockerAgentsApplier;
+    private final DockerAgentConfigApplier                      dockerAgentConfigApplier;
     private final boolean                                       doForcePullOnBuild;
     private final boolean                                       privilegeMode;
     private final Set<String>                                   supportedRecipeTypes;
@@ -149,7 +149,7 @@ public class DockerInstanceProvider implements InstanceProvider {
                                   DockerInstanceStopDetector dockerInstanceStopDetector,
                                   DockerContainerNameGenerator containerNameGenerator,
                                   RecipeRetriever recipeRetriever,
-                                  DockerAgentsApplier dockerAgentsApplier,
+                                  DockerAgentConfigApplier dockerAgentConfigApplier,
                                   @Named("machine.docker.dev_machine.machine_servers") Set<ServerConf> devMachineServers,
                                   @Named("machine.docker.machine_servers") Set<ServerConf> allMachinesServers,
                                   @Named("machine.docker.dev_machine.machine_volumes") Set<String> devMachineSystemVolumes,
@@ -175,7 +175,7 @@ public class DockerInstanceProvider implements InstanceProvider {
         this.supportedRecipeTypes = Sets.newHashSet(DOCKER_FILE_TYPE, DOCKER_IMAGE_TYPE);
         this.projectFolderPath = projectFolderPath;
         this.snapshotUseRegistry = snapshotUseRegistry;
-        this.dockerAgentsApplier = dockerAgentsApplier;
+        this.dockerAgentConfigApplier = dockerAgentConfigApplier;
         // usecases:
         //  -1  enable unlimited swap
         //  0   disable swap
@@ -557,7 +557,7 @@ public class DockerInstanceProvider implements InstanceProvider {
                                                                 .withHostConfig(hostConfig)
                                                                 .withEnv(env.toArray(new String[env.size()]));
 
-            dockerAgentsApplier.applyOn(config, machine.getConfig().getAgents());
+            dockerAgentConfigApplier.applyOn(config, machine.getConfig().getAgents());
             final String containerId = docker.createContainer(CreateContainerParams.create(config)
                                                                                    .withContainerName(containerName))
                                                                                    .getId();

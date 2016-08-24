@@ -16,27 +16,36 @@ import com.google.inject.Singleton;
 import org.eclipse.che.api.agent.server.AgentRegistryUrlProvider;
 import org.eclipse.che.api.agent.server.exception.AgentException;
 
+import javax.inject.Named;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-import static java.lang.String.format;
-
 /**
- * Provides urls to Codenvy update server.
+ * Provides urls to agents.
  *
  * @author Anatolii Bazko
  */
 @Singleton
 public class AgentRegistryUrlProviderImpl implements AgentRegistryUrlProvider {
+    public static final String VERSION = "${version}";
+    public static final String NAME    = "${name}";
 
-    public static final String BASE_URL = "https://codenvy.com/update/repository/";
+    private final String agentLatestVersionUrl;
+    private final String agentSpecificVersionUrl;
+    private final String agentVersionsUrl;
 
     @Inject
-    public AgentRegistryUrlProviderImpl() { }
+    public AgentRegistryUrlProviderImpl(@Named("machine.agent.latest_version_url") String agentLatestVersionUrl,
+                                        @Named("machine.agent.specific_version_url") String agentSpecificVersionUrl,
+                                        @Named("machine.agent.all_versions_url") String agentVersionsUrl) {
+        this.agentLatestVersionUrl = agentLatestVersionUrl;
+        this.agentSpecificVersionUrl = agentSpecificVersionUrl;
+        this.agentVersionsUrl = agentVersionsUrl;
+    }
 
     @Override
     public URL getAgentUrl(String name, String version) throws AgentException {
-        String url = format(BASE_URL + "public/download/%s/%s", name, version);
+        String url = agentSpecificVersionUrl.replace(NAME, name).replace(VERSION, version);
         try {
             return new URL(url);
         } catch (MalformedURLException e) {
@@ -46,7 +55,7 @@ public class AgentRegistryUrlProviderImpl implements AgentRegistryUrlProvider {
 
     @Override
     public URL getAgentUrl(String name) throws AgentException {
-        String url = format(BASE_URL + "public/download/%s", name);
+        String url = agentLatestVersionUrl.replace(NAME, name);
         try {
             return new URL(url);
         } catch (MalformedURLException e) {
@@ -56,7 +65,7 @@ public class AgentRegistryUrlProviderImpl implements AgentRegistryUrlProvider {
 
     @Override
     public URL getAgentVersions(String name) throws AgentException {
-        String url = format(BASE_URL + "/updates/%s", name);
+        String url = agentVersionsUrl.replace(NAME, name);
         try {
             return new URL(url);
         } catch (MalformedURLException e) {

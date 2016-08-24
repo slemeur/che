@@ -14,6 +14,7 @@ import com.google.inject.AbstractModule;
 import com.google.inject.multibindings.Multibinder;
 import com.google.inject.name.Names;
 
+import org.eclipse.che.api.agent.server.AgentLauncher;
 import org.eclipse.che.api.machine.shared.Constants;
 import org.eclipse.che.inject.DynaModule;
 
@@ -65,6 +66,15 @@ public class WsMasterModule extends AbstractModule {
                 .to(org.eclipse.che.api.workspace.server.DefaultWorkspaceValidator.class);
 
         bind(org.eclipse.che.api.workspace.server.event.MachineStateListener.class).asEagerSingleton();
+
+        Multibinder<AgentLauncher> agentLaunchers = Multibinder.newSetBinder(binder(), AgentLauncher.class);
+        agentLaunchers.addBinding().to(org.eclipse.che.api.workspace.server.launcher.WsAgentLauncherImpl.class);
+        agentLaunchers.addBinding().to(org.eclipse.che.api.workspace.server.launcher.TerminalAgentLauncherImpl.class);
+        agentLaunchers.addBinding().to(org.eclipse.che.api.workspace.server.launcher.SshAgentLauncherImpl.class);
+        agentLaunchers.addBinding().to(org.eclipse.che.api.workspace.server.launcher.DefaultAgentLauncher.class);
+        bindConstant().annotatedWith(Names.named("machine.agent.launcher.default"))
+                      .to(org.eclipse.che.api.workspace.server.launcher.DefaultAgentLauncher.class.getName());
+
 
         bind(org.eclipse.che.api.deploy.WsMasterAnalyticsAddresser.class);
 

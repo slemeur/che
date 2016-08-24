@@ -17,7 +17,6 @@ ${CHE_PATH}/che.sh --debug start
 sleep 20s
 
 DOCKER_CONTENT=("FROM fedora:23\nCMD tail -f /dev/null"
-                "FROM alpine:3.3\nCMD tail -f /dev/null"
                 "FROM ubuntu:16.04\nCMD tail -f /dev/null"
                 "FROM ubuntu:14.04\nCMD tail -f /dev/null"
                 "FROM centos:7\nCMD tail -f /dev/null"
@@ -31,7 +30,7 @@ waitStatus() {
 
     for ((j = 0; j < ${ATTEMPTS}; j++))
     do
-        doGet "http://localhost:8080/api/workspace/"${WORKSPACE_ID}
+        doGet "http://"${HOST_URL}"/api/workspace/"${WORKSPACE_ID}
         if echo ${OUTPUT} | grep -qi "\"id\":\"${WORKSPACE_ID}\",\"status\":\"${STATUS}\""; then
             echo ${STATUS}
             break
@@ -56,10 +55,10 @@ validateRunningProcess() {
 deleteWorkspace() {
     WORKSPACE_ID=$1
 
-    doDelete "http://localhost:8080/api/workspace/"${WORKSPACE_ID}"/runtime"
+    doDelete "http://"${HOST_URL}"/api/workspace/"${WORKSPACE_ID}"/runtime"
     STATUS=$(waitStatus ${WORKSPACE_ID} "STOPPED")
     if echo ${STATUS} | grep -qi "STOPPED"; then
-        doDelete "http://localhost:8080/api/workspace/"${WORKSPACE_ID}
+        doDelete "http://"${HOST_URL}"/api/workspace/"${WORKSPACE_ID}
         sleep 1m
     else
         printAndLog "ERROR. Workspace "${WORKSPACE_ID}" can't be stopped"
@@ -75,12 +74,12 @@ do
     printAndLog "####################################################################"
 
     NAME=$(date +%s | sha256sum | base64 | head -c 5)
-    doPost "application/json" "{\"name\":\"${NAME}\",\"projects\":[],\"defaultEnv\":\"${NAME}\",\"description\":null,\"environments\":[{\"name\":\"${NAME}\",\"recipe\":null,\"machineConfigs\":[{\"name\":\"ws-machine\",\"limits\":{\"ram\":1000},\"type\":\"docker\",\"source\":{\"type\":\"dockerfile\",\"content\":\"${CONTENT}\"},\"dev\":true}]}]}" "http://localhost:8080/api/workspace?account="
+    doPost "application/json" "{\"name\":\"${NAME}\",\"projects\":[],\"defaultEnv\":\"${NAME}\",\"description\":null,\"environments\":[{\"name\":\"${NAME}\",\"recipe\":null,\"machineConfigs\":[{\"name\":\"ws-machine\",\"limits\":{\"ram\":1000},\"type\":\"docker\",\"source\":{\"type\":\"dockerfile\",\"content\":\"${CONTENT}\"},\"dev\":true}]}]}" "http://"${HOST_URL}"/api/workspace?account="
     fetchJsonParameter "id"
     WORKSPACE_ID=${OUTPUT}
 
     printAndLog "Starting workspace: "${WORKSPACE_ID}
-    doPost "application/json" "{}" "http://localhost:8080/api/workspace/"${WORKSPACE_ID}"/runtime?environment="${NAME}
+    doPost "application/json" "{}" "http://"${HOST_URL}"/api/workspace/"${WORKSPACE_ID}"/runtime?environment="${NAME}
 
     STATUS=$(waitStatus ${WORKSPACE_ID} "RUNNING")
     if echo ${STATUS} | grep -qi "RUNNING"; then

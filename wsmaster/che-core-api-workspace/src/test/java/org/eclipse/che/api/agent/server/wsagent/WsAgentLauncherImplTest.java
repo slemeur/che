@@ -10,6 +10,7 @@
  *******************************************************************************/
 package org.eclipse.che.api.agent.server.wsagent;
 
+import org.eclipse.che.api.workspace.server.launcher.WsAgentLauncherImpl;
 import org.eclipse.che.api.agent.shared.model.Agent;
 import org.eclipse.che.api.core.BadRequestException;
 import org.eclipse.che.api.core.NotFoundException;

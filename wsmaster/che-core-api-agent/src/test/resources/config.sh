@@ -10,6 +10,6 @@
 #   Codenvy, S.A. - initial API and implementation
 #
 
-CHE_PATH=/home/tolusha/java/projects/che/assembly/assembly-main/target/eclipse-che-4.7.0-RC2-SNAPSHOT/eclipse-che-4.7.0-RC2-SNAPSHOT/bin
+CHE_PATH=/PATH/TO/CHE
 HOST_URL=localhost:8080
-TEST_LOG="test.log"
+TEST_LOG="agents-test.log"

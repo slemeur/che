@@ -38,6 +38,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 
 import static java.lang.String.format;
 import static org.eclipse.che.commons.lang.IoUtil.downloadFile;
@@ -60,31 +61,34 @@ public class AgentRegistryImpl implements AgentRegistry {
 
     @Override
     public Agent createAgent(String name, String version) throws AgentException {
-        URL url = urlProvider.getAgentUrl(name, version);
-        return createAgent(url);
+        URL url = getAgentUrl(name, Optional.ofNullable(version));
+        return doCreateRemoteAgent(url);
     }
 
     @Override
     public Agent createAgent(AgentKey agentKey) throws AgentException {
-        URL url = agentKey.getVersion() != null ? urlProvider.getAgentUrl(agentKey.getName(), agentKey.getVersion())
-                                                : urlProvider.getAgentUrl(agentKey.getName());
-        return createAgent(url);
+        URL url = getAgentUrl(agentKey.getName(), Optional.ofNullable(agentKey.getVersion()));
+        return doCreateRemoteAgent(url);
     }
 
     @Override
     public Agent createAgent(String name) throws AgentException {
-        URL url;
-        if (name.startsWith("http")) {
-            try {
-                url = new URL(name);
-            } catch (MalformedURLException e) {
-                throw new AgentException("Malformed agent url " + name, e);
-            }
-        } else {
-            url = urlProvider.getAgentUrl(name);
+        URL url = getAgentUrl(name, Optional.empty());
+        return doCreateRemoteAgent(url);
+    }
+
+    protected URL getAgentUrl(String name, Optional<String> version) throws AgentException {
+        try {
+            return new URL(name);
+        } catch (MalformedURLException ignored) {
+            // name doesn't represent a url
         }
 
-        return createAgent(url);
+        if (version.isPresent()) {
+            return urlProvider.getAgentUrl(name, version.get());
+        } else {
+            return urlProvider.getAgentUrl(name);
+        }
     }
 
     @Override
@@ -104,7 +108,7 @@ public class AgentRegistryImpl implements AgentRegistry {
         }
     }
 
-    protected Agent createAgent(URL url) throws AgentException {
+    protected Agent doCreateRemoteAgent(URL url) throws AgentException {
         try {
             File agent = downloadFile(new File(System.getProperty("java.io.tmpdir")), "agent", ".tmp", url);
             String json = readAndCloseQuietly(new FileInputStream(agent));

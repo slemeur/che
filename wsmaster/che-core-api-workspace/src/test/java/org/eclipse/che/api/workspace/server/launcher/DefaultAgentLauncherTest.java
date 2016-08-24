@@ -8,12 +8,13 @@
  * Contributors:
  *   Codenvy, S.A. - initial API and implementation
  *******************************************************************************/
-package org.eclipse.che.api.agent.server.impl;
+package org.eclipse.che.api.workspace.server.launcher;
 
 import org.eclipse.che.api.agent.server.AgentLauncher;
 import org.eclipse.che.api.agent.shared.model.Agent;
 import org.eclipse.che.api.core.model.machine.Command;
 import org.eclipse.che.api.core.util.LineConsumer;
+import org.eclipse.che.api.environment.server.MachineProcessManager;
 import org.eclipse.che.api.machine.server.exception.MachineException;
 import org.eclipse.che.api.machine.server.spi.Instance;
 import org.eclipse.che.api.machine.server.spi.InstanceProcess;
@@ -23,6 +24,8 @@ import org.mockito.testng.MockitoTestNGListener;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Listeners;
 import org.testng.annotations.Test;
+
+import javax.inject.Provider;
 
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.doThrow;
@@ -41,13 +44,15 @@ public class DefaultAgentLauncherTest {
     @Mock
     private Agent           agent;
     @Mock
+    private Provider<MachineProcessManager> machineProcessManagerProvider;
+    @Mock
     private InstanceProcess instanceProcess;
 
     private AgentLauncher agentLauncher;
 
     @BeforeMethod
     public void setUp() throws Exception {
-        agentLauncher = new DefaultAgentLauncher();
+        agentLauncher = new DefaultAgentLauncher(10, 10, machineProcessManagerProvider);
 
         when(machine.createProcess(any(), any())).thenReturn(instanceProcess);
         when(agent.getScript()).thenReturn("script1");

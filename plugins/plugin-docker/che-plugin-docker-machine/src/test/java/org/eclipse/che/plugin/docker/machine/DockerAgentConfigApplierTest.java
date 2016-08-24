@@ -37,32 +37,30 @@ import static org.testng.Assert.assertTrue;
  * @author Anatolii Bazko
  */
 @Listeners(value = {MockitoTestNGListener.class})
-public class DockerAgentsApplierTest {
+public class DockerAgentConfigApplierTest {
 
     @Mock
-    private AgentsSorter        sorter;
+    private AgentsSorter         sorter;
     @Mock
-    private MachineConfig       machineConfig;
+    private MachineConfig        machineConfig;
     @Mock
-    private Instance            machine;
+    private Instance             machine;
     @Mock
-    private Agent               agent1;
+    private Agent                agent1;
     @Mock
-    private Agent               agent2;
+    private Agent                agent2;
     @Mock
-    private Agent               agent3;
-    @Mock
-    private Map<String, String> conf;
+    private Agent                agent3;
     @Mock
     private AgentLauncherFactory agentLauncher;
 
-    private DockerAgentsApplier dockerAgentsApplier;
+    private DockerAgentConfigApplier dockerAgentConfigApplier;
 
     @BeforeMethod
     public void setUp() throws Exception {
         when(sorter.sort(any())).thenReturn(Arrays.asList(agent1, agent2, agent3));
 
-        dockerAgentsApplier = new DockerAgentsApplier(conf, sorter);
+        dockerAgentConfigApplier = new DockerAgentConfigApplier(sorter);
 
         when(machine.getConfig()).thenReturn(machineConfig);
         when(machineConfig.getAgents()).thenReturn(asList("fqn1:1.0.0", "fqn2"));
@@ -83,7 +81,7 @@ public class DockerAgentsApplierTest {
         when(agent2.getProperties()).thenReturn(singletonMap("ports", "3333/udp"));
         ContainerConfig containerConfig = new ContainerConfig();
 
-        dockerAgentsApplier.applyOn(containerConfig, machineConfig.getAgents());
+        dockerAgentConfigApplier.applyOn(containerConfig, machineConfig.getAgents());
 
         Map<String, Map<String, String>> exposedPorts = containerConfig.getExposedPorts();
         assertTrue(exposedPorts.containsKey("1111/udp"));
@@ -97,7 +95,7 @@ public class DockerAgentsApplierTest {
         when(agent2.getProperties()).thenReturn(singletonMap("environment", "p3=v3"));
         ContainerConfig containerConfig = new ContainerConfig();
 
-        dockerAgentsApplier.applyOn(containerConfig, machineConfig.getAgents());
+        dockerAgentConfigApplier.applyOn(containerConfig, machineConfig.getAgents());
 
         String[] env = containerConfig.getEnv();
         assertEquals(env.length, 3);
@@ -107,26 +105,12 @@ public class DockerAgentsApplierTest {
     }
 
     @Test
-    public void shouldAddEnvironmentVariableValueFromConfiguration() throws Exception {
-        when(agent1.getProperties()).thenReturn(singletonMap("environment", "p1=${v_template}"));
-        when(conf.get("v_template")).thenReturn("v1");
-
-        ContainerConfig containerConfig = new ContainerConfig();
-
-        dockerAgentsApplier.applyOn(containerConfig, machineConfig.getAgents());
-
-        String[] env = containerConfig.getEnv();
-        assertEquals(env.length, 1);
-        assertEquals(env[0], "p1=v1");
-    }
-
-    @Test
     public void shouldIgnoreEnvironmentVariableIfValueNotFoundInConfiguration() throws Exception {
         when(agent1.getProperties()).thenReturn(singletonMap("environment", "p1=${v_template}"));
 
         ContainerConfig containerConfig = new ContainerConfig();
 
-        dockerAgentsApplier.applyOn(containerConfig, machineConfig.getAgents());
+        dockerAgentConfigApplier.applyOn(containerConfig, machineConfig.getAgents());
 
         String[] env = containerConfig.getEnv();
         assertEquals(env.length, 0);
@@ -138,7 +122,7 @@ public class DockerAgentsApplierTest {
 
         ContainerConfig containerConfig = new ContainerConfig();
 
-        dockerAgentsApplier.applyOn(containerConfig, machineConfig.getAgents());
+        dockerAgentConfigApplier.applyOn(containerConfig, machineConfig.getAgents());
 
         String[] env = containerConfig.getEnv();
         assertEquals(env.length, 0);

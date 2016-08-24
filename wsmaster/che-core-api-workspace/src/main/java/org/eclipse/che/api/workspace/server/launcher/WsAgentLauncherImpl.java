@@ -8,7 +8,7 @@
  * Contributors:
  *   Codenvy, S.A. - initial API and implementation
  *******************************************************************************/
-package org.eclipse.che.api.agent.server.wsagent;
+package org.eclipse.che.api.workspace.server.launcher;
 
 import org.eclipse.che.api.agent.server.AgentLauncher;
 import org.eclipse.che.api.agent.shared.model.Agent;

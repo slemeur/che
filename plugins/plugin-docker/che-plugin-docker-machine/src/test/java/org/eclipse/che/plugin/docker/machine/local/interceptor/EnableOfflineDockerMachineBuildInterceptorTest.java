@@ -29,7 +29,7 @@ import org.eclipse.che.plugin.docker.client.DockerConnector;
 import org.eclipse.che.plugin.docker.client.ProgressMonitor;
 import org.eclipse.che.plugin.docker.client.UserSpecificDockerRegistryCredentialsProvider;
 import org.eclipse.che.plugin.docker.client.params.PullParams;
-import org.eclipse.che.plugin.docker.machine.DockerAgentsApplier;
+import org.eclipse.che.plugin.docker.machine.DockerAgentConfigApplier;
 import org.eclipse.che.plugin.docker.machine.DockerInstanceProvider;
 import org.eclipse.che.plugin.docker.machine.DockerMachineFactory;
 import org.eclipse.che.plugin.docker.machine.DockerMachineModule;
@@ -81,7 +81,7 @@ public class EnableOfflineDockerMachineBuildInterceptorTest {
     @Mock
     private Supplier<Boolean>                             doForcePullOnBuildFlagProvider;
     @Mock
-    private DockerAgentsApplier                           agentsApplier;
+    private DockerAgentConfigApplier                      agentsApplier;
 
 
     private DockerInstanceProvider                     dockerInstanceProvider;
@@ -186,7 +186,7 @@ public class EnableOfflineDockerMachineBuildInterceptorTest {
         @Override
         protected void configure() {
             bind(DockerInstanceProvider.class);
-            bind(DockerAgentsApplier.class).toInstance(agentsApplier);
+            bind(DockerAgentConfigApplier.class).toInstance(agentsApplier);
             bind(DockerConnector.class).toInstance(dockerConnector);
             bind(UserSpecificDockerRegistryCredentialsProvider.class).toInstance(dockerCredentials);
             bind(WorkspaceFolderPathProvider.class).to(LocalWorkspaceFolderPathProvider.class);

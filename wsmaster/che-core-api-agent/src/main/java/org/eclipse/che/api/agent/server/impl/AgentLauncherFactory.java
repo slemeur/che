@@ -16,7 +16,10 @@ import com.google.inject.Singleton;
 import org.eclipse.che.api.agent.server.AgentLauncher;
 import org.eclipse.che.api.agent.shared.model.Agent;
 
+import javax.inject.Named;
+import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * @author Anatolii Bazko
@@ -24,29 +27,26 @@ import java.util.Set;
 @Singleton
 public class AgentLauncherFactory {
 
-    private final Set<AgentLauncher> launchers;
+    private final Map<String, AgentLauncher> launchers;
+    private final AgentLauncher              defaultLauncher;
 
     @Inject
-    public AgentLauncherFactory(Set<AgentLauncher> launchers) {this.launchers = launchers;}
+    public AgentLauncherFactory(Set<AgentLauncher> launchers, @Named("machine.agent.launcher.default") String defaultLauncherName) {
+        this.launchers = launchers.stream().collect(Collectors.toMap(AgentLauncher::getName, l -> l));
+        this.defaultLauncher = this.launchers.get(defaultLauncherName);
+    }
 
     /**
      * Find launcher for given agent independently of version.
      * If {@link AgentLauncher} isn't registered then the default one will be used.
      *
      * @see Agent#getName()
-     * @see DefaultAgentLauncher
      *
-     * @param agentName
+     *  @param agentName
      *      the agent name
      * @return {@link AgentLauncher}
      */
     public AgentLauncher find(String agentName) {
-        for (AgentLauncher launcher : launchers) {
-            if (launcher.getName().equals(agentName)) {
-                return launcher;
-            }
-        }
-
-        return DefaultAgentLauncher.INSTANCE;
+        return launchers.getOrDefault(agentName, defaultLauncher);
     }
 }

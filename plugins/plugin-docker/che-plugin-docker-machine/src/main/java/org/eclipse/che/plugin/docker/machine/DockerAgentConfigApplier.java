@@ -10,58 +10,69 @@
  *******************************************************************************/
 package org.eclipse.che.plugin.docker.machine;
 
-import com.google.common.base.Strings;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
 import org.eclipse.che.api.agent.server.exception.AgentException;
 import org.eclipse.che.api.agent.server.impl.AgentsSorter;
 import org.eclipse.che.api.agent.shared.model.Agent;
-import org.eclipse.che.api.core.model.machine.MachineConfig;
 import org.eclipse.che.api.machine.server.exception.MachineException;
 import org.eclipse.che.plugin.docker.client.json.ContainerConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.inject.Named;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static java.lang.String.format;
 import static java.util.Arrays.asList;
-import static org.eclipse.che.plugin.docker.machine.DockerAgentsApplier.PROPERTIES.ENVIRONMENT;
-import static org.eclipse.che.plugin.docker.machine.DockerAgentsApplier.PROPERTIES.PORTS;
+import static org.eclipse.che.plugin.docker.machine.DockerAgentConfigApplier.PROPERTIES.ENVIRONMENT;
+import static org.eclipse.che.plugin.docker.machine.DockerAgentConfigApplier.PROPERTIES.PORTS;
 
 /**
- * Applies agents over docker machine.
+ * Applies docker specific properties of the agents over {@link ContainerConfig}.
+ * Dependencies between agents are respected.
+ * Docker instance must't be started, otherwise changing configuration has no effect.
+ *
+ * The list of supported properties are:
+ * <li>ports</li>
+ * <li>environment</li>
+ *
+ * The {@code ports} property contains comma separated ports to expose respecting
+ * the following format: "label:port/protocol" or "port/protocol.
+ *
+ * The {@code environment} property contains command separated environment variables to set
+ * respecting the following format: "name=value".
+ *
+ * @see Agent#getProperties()
+ * @see ContainerConfig#getEnv()
+ * @see ContainerConfig#getExposedPorts()
  *
  * @author Anatolii Bazko
  */
 @Singleton
-public class DockerAgentsApplier {
-    private static final Logger  LOG                 = LoggerFactory.getLogger(DockerAgentsApplier.class);
-    private static final Pattern CONF_VALUE_TEMPLATE = Pattern.compile("\\$\\{(.*)\\}");
+public class DockerAgentConfigApplier {
+    private static final Logger LOG = LoggerFactory.getLogger(DockerAgentConfigApplier.class);
 
-    private final AgentsSorter         sorter;
-    private final Map<String, String>  conf;
+    private final AgentsSorter sorter;
 
     @Inject
-    public DockerAgentsApplier(@Named("machine.docker.machine_env") Map<String, String> conf,
-                               AgentsSorter sorter) {
-        this.conf = conf;
+    public DockerAgentConfigApplier(AgentsSorter sorter) {
         this.sorter = sorter;
     }
 
     /**
-     * Applies agents {@link MachineConfig#getAgents()} before starting machine respecting dependencies between agents.
-     * It is means applying machine specific properties over machine configuration.
+     * Applies docker specific properties.
      *
-     * @see Agent#getProperties()
+     * @param containerConfig
+     *      the container configuration to change
+     * @param agentKeys
+     *      the list of injected agents into machine
+     *
+     * @throws MachineException
      */
     public void applyOn(ContainerConfig containerConfig, List<String> agentKeys) throws MachineException {
         try {
@@ -91,23 +102,7 @@ public class DockerAgentsApplier {
                 LOG.warn(format("Illegal environment variable '%s' format", env));
                 continue;
             }
-
-            String envName = items[0];
-            String envValue = items[1];
-
-            Matcher matcher = CONF_VALUE_TEMPLATE.matcher(envValue);
-            if (matcher.find()) {
-                String confValueName = matcher.group(1);
-
-                String newEnvValue = conf.get(confValueName);
-                if (!Strings.isNullOrEmpty(newEnvValue)) {
-                    newEnv.add(envName + "=" + newEnvValue);
-                } else {
-                    LOG.warn(format("Environment variable value '%s' not found in the configuration", confValueName));
-                }
-            } else {
-                newEnv.add(env);
-            }
+            newEnv.add(env);
         }
 
         containerConfig.setEnv(newEnv.toArray(new String[newEnv.size()]));
