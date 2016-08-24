@@ -59,7 +59,7 @@
             <useProjectArtifact>false</useProjectArtifact>
             <unpack>false</unpack>
             <outputDirectory>lib</outputDirectory>
-            <outputFileNameMapping>ws-agent.zip</outputFileNameMapping>
+            <outputFileNameMapping>ws-agent.tar.gz</outputFileNameMapping>
             <includes>
                 <include>org.eclipse.che:assembly-wsagent-server</include>
             </includes>
