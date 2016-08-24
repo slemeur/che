@@ -16,7 +16,7 @@ import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import org.eclipse.che.api.agent.server.AgentLauncher;
 import org.eclipse.che.api.agent.server.exception.AgentException;
 import org.eclipse.che.api.agent.server.impl.AgentLauncherFactory;
-import org.eclipse.che.api.agent.server.impl.AgentsSorter;
+import org.eclipse.che.api.agent.server.impl.AgentSorter;
 import org.eclipse.che.api.agent.shared.model.Agent;
 import org.eclipse.che.api.core.ApiException;
 import org.eclipse.che.api.core.ConflictException;
@@ -93,7 +93,7 @@ public class WorkspaceRuntimes {
     private final EventService                eventService;
     private final StripedLocks                stripedLocks;
     private final CheEnvironmentEngine        environmentEngine;
-    private final AgentsSorter                agentsSorter;
+    private final AgentSorter                 agentSorter;
     private final AgentLauncherFactory        agentLauncherFactory;
 
     private volatile boolean isPreDestroyInvoked;
@@ -101,11 +101,11 @@ public class WorkspaceRuntimes {
     @Inject
     public WorkspaceRuntimes(EventService eventService,
                              CheEnvironmentEngine environmentEngine,
-                             AgentsSorter agentsSorter,
+                             AgentSorter agentSorter,
                              AgentLauncherFactory agentLauncherFactory) {
         this.eventService = eventService;
         this.environmentEngine = environmentEngine;
-        this.agentsSorter = agentsSorter;
+        this.agentSorter = agentSorter;
         this.agentLauncherFactory = agentLauncherFactory;
         this.workspaces = new HashMap<>();
         // 16 - experimental value for stripes count, it comes from default hash map size
@@ -571,7 +571,7 @@ public class WorkspaceRuntimes {
     private void launchAgents(Instance instance) throws MachineException {
         List<Agent> agents;
         try {
-            agents = agentsSorter.sort(instance.getConfig().getAgents());
+            agents = agentSorter.sort(instance.getConfig().getAgents());
         } catch (AgentException e) {
             throw new MachineException("Can't build proper order of agents to launch", e);
         }

@@ -12,9 +12,10 @@
 unset PACKAGES
 unset SUDO
 command -v tar >/dev/null 2>&1 || { PACKAGES=${PACKAGES}" tar"; }
-command -v wget >/dev/null 2>&1 || { PACKAGES=${PACKAGES}" curl"; }
+command -v curl >/dev/null 2>&1 || { PACKAGES=${PACKAGES}" curl"; }
 test "$(id -u)" = 0 || SUDO="sudo"
 
+AGENT_BINARIES_URI=file:///mnt/che/ws-agent.tar.gz
 CHE_DIR=$HOME/che
 LINUX_TYPE=$(cat /etc/os-release | grep ^ID= | tr '[:upper:]' '[:lower:]')
 LINUX_VERSION=$(cat /etc/os-release | grep ^VERSION=)
@@ -102,6 +103,6 @@ command -v ${JAVA_HOME}/bin/java >/dev/null 2>&1 || {
 
 rm -rf ${CHE_DIR}/ws-agent
 mkdir -p ${CHE_DIR}/ws-agent
-curl -s  https://codenvy.com/update/repository/public/download/org.eclipse.che.ws-agent.binaries | tar  xzf - -C ${CHE_DIR}/ws-agent
+curl -s  ${AGENT_BINARIES_URI} | tar  xzf - -C ${CHE_DIR}/ws-agent
 
 JPDA_ADDRESS=4403 && ${CHE_DIR}/ws-agent/bin/catalina.sh jpda run

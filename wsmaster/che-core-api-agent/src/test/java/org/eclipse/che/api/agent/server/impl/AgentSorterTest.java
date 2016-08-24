@@ -34,7 +34,7 @@ import static org.testng.AssertJUnit.assertEquals;
  * @author Anatolii Bazko
  */
 @Listeners(value = {MockitoTestNGListener.class})
-public class AgentsSorterTest {
+public class AgentSorterTest {
 
     @Mock
     private AgentRegistry agentRegistry;
@@ -46,7 +46,7 @@ public class AgentsSorterTest {
     private Agent         agent3;
 
     @InjectMocks
-    private AgentsSorter agentsSorter;
+    private AgentSorter agentSorter;
 
     @BeforeMethod
     public void setUp() throws Exception {
@@ -66,7 +66,7 @@ public class AgentsSorterTest {
 
     @Test
     public void sortAgentsRespectingDependencies() throws Exception {
-        List<Agent> sorted = agentsSorter.sort(Arrays.asList("fqn1", "fqn2", "fqn3"));
+        List<Agent> sorted = agentSorter.sort(Arrays.asList("fqn1", "fqn2", "fqn3"));
 
         assertEquals(sorted.size(), 3);
         assertEquals(sorted.get(0).getName(), "fqn3");
@@ -79,11 +79,11 @@ public class AgentsSorterTest {
         when(agent1.getDependencies()).thenReturn(singletonList("fqn2"));
         when(agent2.getDependencies()).thenReturn(singletonList("fqn1"));
 
-        agentsSorter.sort(Arrays.asList("fqn1", "fqn2"));
+        agentSorter.sort(Arrays.asList("fqn1", "fqn2"));
     }
 
     @Test(expectedExceptions = AgentNotFoundException.class)
     public void sortingShouldFailIfAgentNotFound() throws Exception {
-        agentsSorter.sort(singletonList("fqn4"));
+        agentSorter.sort(singletonList("fqn4"));
     }
 }

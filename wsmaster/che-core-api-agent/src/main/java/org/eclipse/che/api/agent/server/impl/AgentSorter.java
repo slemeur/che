@@ -34,12 +34,12 @@ import static org.eclipse.che.api.agent.server.model.impl.AgentKeyImpl.parse;
  * @author Anatolii Bazko
  */
 @Singleton
-public class AgentsSorter {
+public class AgentSorter {
 
     private final AgentRegistry agentRegistry;
 
     @Inject
-    public AgentsSorter(AgentRegistry agentRegistry) {this.agentRegistry = agentRegistry;}
+    public AgentSorter(AgentRegistry agentRegistry) {this.agentRegistry = agentRegistry;}
 
     /**
      * Sort and created agents respecting dependencies between them.
@@ -64,9 +64,9 @@ public class AgentsSorter {
         for (String agentKey : agentKeys) {
             doSort(parse(agentKey), sorted, pending);
         }
-        doSort(parse("org.eclipse.che.terminal"), sorted, pending);
-        doSort(parse("org.eclipse.che.ws-agent"), sorted, pending);
-        doSort(parse("org.eclipse.che.ssh"), sorted, pending);
+//        doSort(parse("org.eclipse.che.terminal"), sorted, pending);
+//        doSort(parse("org.eclipse.che.ws-agent"), sorted, pending);
+//        doSort(parse("org.eclipse.che.ssh"), sorted, pending);
 
         return new ArrayList<>(sorted.values());
     }

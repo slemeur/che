@@ -14,7 +14,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
 import org.eclipse.che.api.agent.server.exception.AgentException;
-import org.eclipse.che.api.agent.server.impl.AgentsSorter;
+import org.eclipse.che.api.agent.server.impl.AgentSorter;
 import org.eclipse.che.api.agent.shared.model.Agent;
 import org.eclipse.che.api.machine.server.exception.MachineException;
 import org.eclipse.che.plugin.docker.client.json.ContainerConfig;
@@ -57,10 +57,10 @@ import static org.eclipse.che.plugin.docker.machine.DockerAgentConfigApplier.PRO
 public class DockerAgentConfigApplier {
     private static final Logger LOG = LoggerFactory.getLogger(DockerAgentConfigApplier.class);
 
-    private final AgentsSorter sorter;
+    private final AgentSorter sorter;
 
     @Inject
-    public DockerAgentConfigApplier(AgentsSorter sorter) {
+    public DockerAgentConfigApplier(AgentSorter sorter) {
         this.sorter = sorter;
     }
 

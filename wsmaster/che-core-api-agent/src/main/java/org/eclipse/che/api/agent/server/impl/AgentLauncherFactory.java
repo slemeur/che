@@ -38,7 +38,7 @@ public class AgentLauncherFactory {
 
     /**
      * Find launcher for given agent independently of version.
-     * If {@link AgentLauncher} isn't registered then the default one will be used.
+     * If the specific {@link AgentLauncher} isn't registered then the default one will be used.
      *
      * @see Agent#getName()
      *

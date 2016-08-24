@@ -142,11 +142,14 @@ public class IoUtil {
     }
 
     /**
-     * Provides streams to all resources matching {@code pattern} criteria.
+     * Provides streams to all resources matching {@code filter} criteria.
+     * Method search inside archive if context represents a jar file.
      *
+     * @param context
+     *      the current context
      * @throws IOException
      */
-    public static void getResources(Class context, Pattern pattern, Consumer<InputStream> consumer) throws IOException {
+    public static void getResources(Class context, Pattern filter, Consumer<InputStream> consumer) throws IOException {
         final Path jarFile = Paths.get(context.getProtectionDomain().getCodeSource().getLocation().getPath());
 
         if (Files.isRegularFile(jarFile)) {
@@ -155,7 +158,7 @@ public class IoUtil {
                 while (entries.hasMoreElements()) {
                     JarEntry jarEntry = entries.nextElement();
                     final String name = jarEntry.getName();
-                    if (pattern.matcher(name).matches()) {
+                    if (filter.matcher(name).matches()) {
                         try (InputStream in = jar.getInputStream(jarEntry)) {
                             consumer.accept(in);
                         }
@@ -168,7 +171,7 @@ public class IoUtil {
                 try {
                     final Path root = Paths.get(url.toURI());
                     Files.walk(root)
-                         .filter(path -> pattern.matcher(path.toString()).matches())
+                         .filter(path -> filter.matcher(path.toString()).matches())
                          .forEach(path -> {
                              try (InputStream in = Files.newInputStream(path)) {
                                  consumer.accept(in);

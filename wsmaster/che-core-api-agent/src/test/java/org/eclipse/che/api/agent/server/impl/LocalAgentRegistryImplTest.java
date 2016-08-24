@@ -10,13 +10,14 @@
  *******************************************************************************/
 package org.eclipse.che.api.agent.server.impl;
 
+import org.eclipse.che.api.agent.shared.model.Agent;
 import org.everrest.assured.EverrestJetty;
 import org.mockito.InjectMocks;
 import org.mockito.testng.MockitoTestNGListener;
-import org.testng.ITestContext;
-import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Listeners;
 import org.testng.annotations.Test;
+
+import static org.testng.AssertJUnit.assertNotNull;
 
 /**
  * @author Anatoliy Bazko
@@ -27,11 +28,10 @@ public class LocalAgentRegistryImplTest {
     @InjectMocks
     private LocalAgentRegistryImpl agentRegistry;
 
-    @BeforeMethod
-    public void setUp(ITestContext context) throws Exception {
-    }
-
     @Test
     public void testName() throws Exception {
+        final Agent agent = agentRegistry.createAgent("org.eclipse.che.test");
+     
+        assertNotNull(agent);
     }
 }

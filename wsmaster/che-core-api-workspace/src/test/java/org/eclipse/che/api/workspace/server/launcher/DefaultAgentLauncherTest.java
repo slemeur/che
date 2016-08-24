@@ -13,7 +13,6 @@ package org.eclipse.che.api.workspace.server.launcher;
 import org.eclipse.che.api.agent.server.AgentLauncher;
 import org.eclipse.che.api.agent.shared.model.Agent;
 import org.eclipse.che.api.core.model.machine.Command;
-import org.eclipse.che.api.core.util.LineConsumer;
 import org.eclipse.che.api.environment.server.MachineProcessManager;
 import org.eclipse.che.api.machine.server.exception.MachineException;
 import org.eclipse.che.api.machine.server.spi.Instance;
@@ -28,6 +27,7 @@ import org.testng.annotations.Test;
 import javax.inject.Provider;
 
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -40,21 +40,24 @@ import static org.testng.Assert.assertEquals;
 public class DefaultAgentLauncherTest {
 
     @Mock
-    private Instance        machine;
+    private Instance                        machine;
     @Mock
-    private Agent           agent;
+    private Agent                           agent;
+    @Mock
+    private MachineProcessManager           machineProcessManager;
     @Mock
     private Provider<MachineProcessManager> machineProcessManagerProvider;
     @Mock
-    private InstanceProcess instanceProcess;
+    private InstanceProcess                 instanceProcess;
 
     private AgentLauncher agentLauncher;
 
     @BeforeMethod
     public void setUp() throws Exception {
-        agentLauncher = new DefaultAgentLauncher(10, 10, machineProcessManagerProvider);
+        agentLauncher = new DefaultAgentLauncher(120000, 10, machineProcessManagerProvider);
 
-        when(machine.createProcess(any(), any())).thenReturn(instanceProcess);
+        when(machineProcessManagerProvider.get()).thenReturn(machineProcessManager);
+        when(machineProcessManager.exec(any(), any(), any(), any())).thenReturn(instanceProcess);
         when(agent.getScript()).thenReturn("script1");
     }
 
@@ -64,17 +67,15 @@ public class DefaultAgentLauncherTest {
 
         agentLauncher.launch(machine, agent);
 
-        verify(machine).createProcess(commandCaptor.capture(), any());
+        verify(machineProcessManager).exec(anyString(), anyString(), commandCaptor.capture(), any());
 
         Command command = commandCaptor.getValue();
         assertEquals(command.getCommandLine(), "script1");
-
-        verify(instanceProcess).start(any(LineConsumer.class));
     }
 
     @Test(expectedExceptions = MachineException.class, expectedExceptionsMessageRegExp = "Start failed")
     public void executeScriptsShouldFailIfProcessFailed() throws Exception {
-        doThrow(new MachineException("Start failed")).when(instanceProcess).start(any(LineConsumer.class));
+        doThrow(new MachineException("Start failed")).when(machineProcessManager).exec(any(), any(), any(), any());
 
         agentLauncher.launch(machine, agent);
     }

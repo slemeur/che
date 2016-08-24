@@ -13,8 +13,7 @@ package org.eclipse.che.api.agent.server;
 import com.google.inject.AbstractModule;
 import com.google.inject.name.Names;
 
-import org.eclipse.che.api.agent.server.impl.AgentRegistryImpl;
-import org.eclipse.che.api.agent.server.impl.AgentRegistryUrlProviderImpl;
+import org.eclipse.che.api.agent.server.impl.LocalAgentRegistryImpl;
 
 /**
  * @author Anatolii Bazko
@@ -25,8 +24,7 @@ public class AgentModule extends AbstractModule {
         bindConstant().annotatedWith(Names.named("machine.agent.max_start_time_ms")).to(120000);
         bindConstant().annotatedWith(Names.named("machine.agent.ping_delay_ms")).to(1000);
 
-        bind(AgentRegistryUrlProvider.class).to(AgentRegistryUrlProviderImpl.class);
-        bind(AgentRegistry.class).to(AgentRegistryImpl.class);
+        bind(AgentRegistry.class).to(LocalAgentRegistryImpl.class);
         bind(AgentService.class);
     }
 }

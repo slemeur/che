@@ -27,6 +27,7 @@ import static java.lang.String.format;
 public class WaitProcessToLaunchChecker implements AgentLaunchingChecker {
 
     private final String processNameToWait;
+    private long counter;
 
     public WaitProcessToLaunchChecker(String processNameToWait) {
         this.processNameToWait = processNameToWait;
@@ -34,7 +35,7 @@ public class WaitProcessToLaunchChecker implements AgentLaunchingChecker {
 
     @Override
     public boolean isLaunched(Agent agent, InstanceProcess process, Instance machine) throws MachineException {
-        Command command = new CommandImpl("Wait for " + agent.getName(),
+        Command command = new CommandImpl(format("Wait for %s, try %d", agent.getName(), ++counter),
                                           format("ps -fC %s 1>/dev/null && echo 0 || echo 1", processNameToWait),
                                           "test");
 

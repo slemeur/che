@@ -30,7 +30,7 @@
         <dependency>
             <groupId>org.eclipse.che</groupId>
             <artifactId>assembly-wsagent-server</artifactId>
-            <type>zip</type>
+            <type>tar.gz</type>
         </dependency>
         <dependency>
             <groupId>org.eclipse.che</groupId>

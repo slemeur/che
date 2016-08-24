@@ -15,12 +15,14 @@ import org.eclipse.che.api.machine.server.exception.MachineException;
 import org.eclipse.che.api.machine.server.spi.Instance;
 
 /**
+ * Launches agent.
+ *
  * @author Anatolii Bazko
  */
 public interface AgentLauncher {
 
     /**
-     * @return agent name which launcher is designed for
+     * @return the name of the corresponding agent
      */
     String getName();
 

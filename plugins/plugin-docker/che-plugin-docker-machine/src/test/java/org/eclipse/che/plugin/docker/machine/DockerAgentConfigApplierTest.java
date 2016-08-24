@@ -11,7 +11,7 @@
 package org.eclipse.che.plugin.docker.machine;
 
 import org.eclipse.che.api.agent.server.impl.AgentLauncherFactory;
-import org.eclipse.che.api.agent.server.impl.AgentsSorter;
+import org.eclipse.che.api.agent.server.impl.AgentSorter;
 import org.eclipse.che.api.agent.shared.model.Agent;
 import org.eclipse.che.api.core.model.machine.MachineConfig;
 import org.eclipse.che.api.machine.server.spi.Instance;
@@ -40,7 +40,7 @@ import static org.testng.Assert.assertTrue;
 public class DockerAgentConfigApplierTest {
 
     @Mock
-    private AgentsSorter         sorter;
+    private AgentSorter          sorter;
     @Mock
     private MachineConfig        machineConfig;
     @Mock
@@ -104,17 +104,6 @@ public class DockerAgentConfigApplierTest {
         assertEquals(env[2], "p3=v3");
     }
 
-    @Test
-    public void shouldIgnoreEnvironmentVariableIfValueNotFoundInConfiguration() throws Exception {
-        when(agent1.getProperties()).thenReturn(singletonMap("environment", "p1=${v_template}"));
-
-        ContainerConfig containerConfig = new ContainerConfig();
-
-        dockerAgentConfigApplier.applyOn(containerConfig, machineConfig.getAgents());
-
-        String[] env = containerConfig.getEnv();
-        assertEquals(env.length, 0);
-    }
 
     @Test
     public void shouldIgnoreEnvironmentIfIllegalFormat() throws Exception {

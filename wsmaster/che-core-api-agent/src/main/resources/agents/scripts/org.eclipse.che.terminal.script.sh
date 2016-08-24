@@ -12,10 +12,11 @@
 unset PACKAGES
 unset SUDO
 command -v tar >/dev/null 2>&1 || { PACKAGES=${PACKAGES}" tar"; }
-command -v wget >/dev/null 2>&1 || { PACKAGES=${PACKAGES}" curl"; }
+command -v curl >/dev/null 2>&1 || { PACKAGES=${PACKAGES}" curl"; }
 test "$(id -u)" = 0 || SUDO="sudo"
 
 CHE_DIR=$HOME/che
+AGENT_BINARIES_URI=file:///mnt/che/.tar.gz
 LINUX_TYPE=$(cat /etc/os-release | grep ^ID= | tr '[:upper:]' '[:lower:]')
 LINUX_VERSION=$(cat /etc/os-release | grep ^VERSION=)
 MACHINE_TYPE=$(uname -m)
