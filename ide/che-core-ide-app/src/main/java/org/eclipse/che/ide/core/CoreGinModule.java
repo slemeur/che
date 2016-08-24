@@ -56,10 +56,14 @@ import org.eclipse.che.ide.api.git.GitServiceClient;
 import org.eclipse.che.ide.api.git.GitServiceClientImpl;
 import org.eclipse.che.ide.api.icon.IconRegistry;
 import org.eclipse.che.ide.api.keybinding.KeyBindingAgent;
+import org.eclipse.che.ide.api.machine.CommandPropertyValueProviderRegistry;
 import org.eclipse.che.ide.api.machine.MachineServiceClient;
 import org.eclipse.che.ide.api.machine.MachineServiceClientImpl;
 import org.eclipse.che.ide.api.machine.RecipeServiceClient;
 import org.eclipse.che.ide.api.machine.RecipeServiceClientImpl;
+import org.eclipse.che.ide.ui.multisplitpanel.SubPanel;
+import org.eclipse.che.ide.ui.multisplitpanel.SubPanelFactory;
+import org.eclipse.che.ide.ui.multisplitpanel.tab.Tab;
 import org.eclipse.che.ide.api.notification.NotificationManager;
 import org.eclipse.che.ide.api.oauth.OAuth2Authenticator;
 import org.eclipse.che.ide.api.oauth.OAuth2AuthenticatorRegistry;
@@ -135,6 +139,7 @@ import org.eclipse.che.ide.jsonrpc.impl.WebSocketJsonRpcRequestTransmitter;
 import org.eclipse.che.ide.jsonrpc.impl.WebSocketJsonRpcResponseDispatcher;
 import org.eclipse.che.ide.jsonrpc.impl.WebSocketJsonRpcResponseTransmitter;
 import org.eclipse.che.ide.keybinding.KeyBindingManager;
+import org.eclipse.che.ide.machine.CommandPropertyValueProviderRegistryImpl;
 import org.eclipse.che.ide.menu.MainMenuView;
 import org.eclipse.che.ide.menu.MainMenuViewImpl;
 import org.eclipse.che.ide.menu.StatusPanelGroupView;
@@ -225,6 +230,12 @@ import org.eclipse.che.ide.ui.dropdown.DropDownWidgetImpl;
 import org.eclipse.che.ide.ui.loaders.initialization.LoaderView;
 import org.eclipse.che.ide.ui.loaders.initialization.LoaderViewImpl;
 import org.eclipse.che.ide.ui.loaders.request.LoaderFactory;
+import org.eclipse.che.ide.ui.multisplitpanel.panel.SubPanelPresenter;
+import org.eclipse.che.ide.ui.multisplitpanel.panel.SubPanelView;
+import org.eclipse.che.ide.ui.multisplitpanel.panel.SubPanelViewFactory;
+import org.eclipse.che.ide.ui.multisplitpanel.panel.SubPanelViewImpl;
+import org.eclipse.che.ide.ui.multisplitpanel.tab.TabItemFactory;
+import org.eclipse.che.ide.ui.multisplitpanel.tab.TabWidget;
 import org.eclipse.che.ide.ui.toolbar.MainToolbar;
 import org.eclipse.che.ide.ui.toolbar.ToolbarPresenter;
 import org.eclipse.che.ide.ui.toolbar.ToolbarView;
@@ -454,6 +465,9 @@ public class CoreGinModule extends AbstractGinModule {
 
         GinMultibinder<NodeInterceptor> nodeInterceptors = GinMultibinder.newSetBinder(binder(), NodeInterceptor.class);
         nodeInterceptors.addBinding().to(DefaultNodeInterceptor.class);
+
+        // Machine
+        bind(CommandPropertyValueProviderRegistry.class).to(CommandPropertyValueProviderRegistryImpl.class).in(Singleton.class);
     }
 
     /** Configure Core UI components, resources and views */
@@ -502,6 +516,14 @@ public class CoreGinModule extends AbstractGinModule {
                                              .implement(InputDialog.class, InputDialogPresenter.class)
                                              .implement(ChoiceDialog.class, ChoiceDialogPresenter.class)
                                              .build(DialogFactory.class));
+
+        install(new GinFactoryModuleBuilder().implement(SubPanelView.class, SubPanelViewImpl.class)
+                                             .build(SubPanelViewFactory.class));
+        install(new GinFactoryModuleBuilder().implement(SubPanel.class, SubPanelPresenter.class)
+                                             .build(SubPanelFactory.class));
+        install(new GinFactoryModuleBuilder().implement(Tab.class, TabWidget.class)
+                                             .build(TabItemFactory.class));
+
         install(new GinFactoryModuleBuilder().implement(ConsoleButton.class, ConsoleButtonImpl.class)
                                              .build(ConsoleButtonFactory.class));
         install(new GinFactoryModuleBuilder().implement(ProjectNotificationSubscriber.class,
