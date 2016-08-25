@@ -13,10 +13,10 @@ package org.eclipse.che.api.workspace.server;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 
-import org.eclipse.che.api.agent.server.AgentLauncher;
 import org.eclipse.che.api.agent.server.exception.AgentException;
-import org.eclipse.che.api.agent.server.impl.AgentLauncherFactory;
 import org.eclipse.che.api.agent.server.impl.AgentSorter;
+import org.eclipse.che.api.agent.server.launcher.AgentLauncher;
+import org.eclipse.che.api.agent.server.launcher.AgentLauncherFactory;
 import org.eclipse.che.api.agent.shared.model.Agent;
 import org.eclipse.che.api.core.ApiException;
 import org.eclipse.che.api.core.ConflictException;
@@ -579,7 +579,7 @@ public class WorkspaceRuntimes {
         for (Agent agent : agents) {
             LOG.info("Launching " + agent.getName());
 
-            AgentLauncher agentLauncher = agentLauncherFactory.find(agent.getName());
+            AgentLauncher agentLauncher = agentLauncherFactory.find(agent.getName(), instance.getConfig().getType());
             agentLauncher.launch(instance, agent);
         }
     }

@@ -10,7 +10,7 @@
  *******************************************************************************/
 package org.eclipse.che.plugin.docker.machine;
 
-import org.eclipse.che.api.agent.server.impl.AgentLauncherFactory;
+import org.eclipse.che.api.agent.server.launcher.AgentLauncherFactory;
 import org.eclipse.che.api.agent.server.impl.AgentSorter;
 import org.eclipse.che.api.agent.shared.model.Agent;
 import org.eclipse.che.api.core.model.machine.MachineConfig;

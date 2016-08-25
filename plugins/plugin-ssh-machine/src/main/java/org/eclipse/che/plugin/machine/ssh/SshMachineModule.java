@@ -38,6 +38,9 @@ public class SshMachineModule extends AbstractModule {
                                    org.eclipse.che.plugin.machine.ssh.jsch.JschSshClient.class)
                         .build(SshMachineFactory.class));
 
+        Multibinder.newSetBinder(binder(), org.eclipse.che.api.agent.server.launcher.AgentLauncher.class)
+                   .addBinding().to(org.eclipse.che.plugin.machine.ssh.SshMachineImplTerminalLauncher.class);
+
         Multibinder<org.eclipse.che.api.core.model.machine.ServerConf> machineServers =
                 Multibinder.newSetBinder(binder(),
                                          org.eclipse.che.api.core.model.machine.ServerConf.class,

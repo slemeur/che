@@ -8,7 +8,7 @@
  * Contributors:
  *   Codenvy, S.A. - initial API and implementation
  *******************************************************************************/
-package org.eclipse.che.api.agent.server;
+package org.eclipse.che.api.agent.server.launcher;
 
 import org.eclipse.che.api.agent.shared.model.Agent;
 import org.eclipse.che.api.machine.server.exception.MachineException;
@@ -22,9 +22,14 @@ import org.eclipse.che.api.machine.server.spi.Instance;
 public interface AgentLauncher {
 
     /**
-     * @return the name of the corresponding agent
+     * @return the name of the agent that launcher is designed for
      */
-    String getName();
+    String getAgentName();
+
+    /**
+     * @return the machine type that launcher is designed for
+     */
+    String getMachineType();
 
     /**
      * Executes agents scripts over target machine.

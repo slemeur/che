@@ -8,21 +8,18 @@
  * Contributors:
  *   Codenvy, S.A. - initial API and implementation
  *******************************************************************************/
-package org.eclipse.che.api.workspace.server.launcher;
+package org.eclipse.che.api.agent.server.launcher;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
-import org.eclipse.che.api.environment.server.MachineProcessManager;
-
 import javax.inject.Named;
-import javax.inject.Provider;
 
 /**
  * Launches agent and waits while it is finished.
  *
  * This agents is suited only for those types of agents that install software
- * and finish working without launching additional processes at the end.
+ * and finish working without launching any processes at the end.
  *
  * @author Anatolii Bazko
  */
@@ -30,16 +27,17 @@ import javax.inject.Provider;
 public class DefaultAgentLauncher extends AbstractAgentLauncher {
     @Inject
     public DefaultAgentLauncher(@Named("machine.agent.max_start_time_ms") long agentMaxStartTimeMs,
-                                @Named("machine.agent.ping_delay_ms") long agentPingDelayMs,
-                                Provider<MachineProcessManager> machineProcessManagerProvider) {
-        super(agentMaxStartTimeMs,
-              agentPingDelayMs,
-              machineProcessManagerProvider,
-              ((agent, process, machine) -> !process.isAlive()));
+                                @Named("machine.agent.ping_delay_ms") long agentPingDelayMs) {
+        super(agentMaxStartTimeMs, agentPingDelayMs, AgentLaunchingChecker.DEFAULT);
     }
 
     @Override
-    public String getName() {
-        return getClass().getName();
+    public String getAgentName() {
+        return "any";
+    }
+
+    @Override
+    public String getMachineType() {
+        return "any";
     }
 }

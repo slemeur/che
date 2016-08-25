@@ -8,7 +8,7 @@
  * Contributors:
  *   Codenvy, S.A. - initial API and implementation
  *******************************************************************************/
-package org.eclipse.che.api.workspace.server.launcher;
+package org.eclipse.che.api.agent.server.launcher;
 
 import org.eclipse.che.api.agent.shared.model.Agent;
 import org.eclipse.che.api.core.ConflictException;
@@ -24,12 +24,12 @@ import static java.lang.String.format;
 /**
  * @author Anatoliy Bazko
  */
-public class WaitProcessToLaunchChecker implements AgentLaunchingChecker {
+public class AgentIsFinishedChecker implements AgentLaunchingChecker {
 
     private final String processNameToWait;
     private long counter;
 
-    public WaitProcessToLaunchChecker(String processNameToWait) {
+    public AgentIsFinishedChecker(String processNameToWait) {
         this.processNameToWait = processNameToWait;
     }
 

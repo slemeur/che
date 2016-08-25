@@ -8,18 +8,15 @@
  * Contributors:
  *   Codenvy, S.A. - initial API and implementation
  *******************************************************************************/
-package org.eclipse.che.api.agent.server.impl;
+package org.eclipse.che.api.agent.server.launcher;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
-import org.eclipse.che.api.agent.server.AgentLauncher;
 import org.eclipse.che.api.agent.shared.model.Agent;
+import org.eclipse.che.api.core.model.machine.MachineConfig;
 
-import javax.inject.Named;
-import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 /**
  * @author Anatolii Bazko
@@ -27,13 +24,13 @@ import java.util.stream.Collectors;
 @Singleton
 public class AgentLauncherFactory {
 
-    private final Map<String, AgentLauncher> launchers;
-    private final AgentLauncher              defaultLauncher;
+    private final Set<AgentLauncher> launchers;
+    private final AgentLauncher      defaultLauncher;
 
     @Inject
-    public AgentLauncherFactory(Set<AgentLauncher> launchers, @Named("machine.agent.launcher.default") String defaultLauncherName) {
-        this.launchers = launchers.stream().collect(Collectors.toMap(AgentLauncher::getName, l -> l));
-        this.defaultLauncher = this.launchers.get(defaultLauncherName);
+    public AgentLauncherFactory(Set<AgentLauncher> launchers, DefaultAgentLauncher defaultLauncher) {
+        this.launchers = launchers;
+        this.defaultLauncher = defaultLauncher;
     }
 
     /**
@@ -41,12 +38,18 @@ public class AgentLauncherFactory {
      * If the specific {@link AgentLauncher} isn't registered then the default one will be used.
      *
      * @see Agent#getName()
+     * @see MachineConfig#getType()
      *
-     *  @param agentName
+     * @param agentName
      *      the agent name
+     * @param machineType
+     *      the machine type
      * @return {@link AgentLauncher}
      */
-    public AgentLauncher find(String agentName) {
-        return launchers.getOrDefault(agentName, defaultLauncher);
+    public AgentLauncher find(String agentName, String machineType) {
+        return launchers.stream().filter(l -> agentName.equals(l.getAgentName())
+                                              && machineType.equals(l.getMachineType()))
+                        .findAny()
+                        .orElse(defaultLauncher);
     }
 }

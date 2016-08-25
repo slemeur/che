@@ -10,7 +10,7 @@
  *******************************************************************************/
 package org.eclipse.che.api.workspace.server.launcher;
 
-import org.eclipse.che.api.agent.server.AgentLauncher;
+import org.eclipse.che.api.agent.server.launcher.AgentLauncher;
 import org.eclipse.che.api.agent.shared.model.Agent;
 import org.eclipse.che.api.core.ApiException;
 import org.eclipse.che.api.core.BadRequestException;
@@ -73,8 +73,13 @@ public class WsAgentLauncherImpl implements AgentLauncher {
     }
 
     @Override
-    public String getName() {
+    public String getAgentName() {
         return "org.eclipse.che.ws-agent";
+    }
+
+    @Override
+    public String getMachineType() {
+        return "docker";
     }
 
     @Override
@@ -90,7 +95,7 @@ public class WsAgentLauncherImpl implements AgentLauncher {
         try {
             machineProcessManagerProvider.get().exec(machine.getWorkspaceId(),
                                                      machine.getId(),
-                                                     new CommandImpl(getName(), agent.getScript(), "Arbitrary"),
+                                                     new CommandImpl(getAgentName(), agent.getScript(), "Arbitrary"),
                                                      getWsAgentProcessOutputChannel(machine.getWorkspaceId()));
 
             final long pingStartTimestamp = System.currentTimeMillis();
