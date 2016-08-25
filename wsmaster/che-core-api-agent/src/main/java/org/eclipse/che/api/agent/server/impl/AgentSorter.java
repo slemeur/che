@@ -64,9 +64,9 @@ public class AgentSorter {
         for (String agentKey : agentKeys) {
             doSort(parse(agentKey), sorted, pending);
         }
-//        doSort(parse("org.eclipse.che.terminal"), sorted, pending);
-//        doSort(parse("org.eclipse.che.ws-agent"), sorted, pending);
-//        doSort(parse("org.eclipse.che.ssh"), sorted, pending);
+        doSort(parse("org.eclipse.che.terminal"), sorted, pending);
+        doSort(parse("org.eclipse.che.ws-agent"), sorted, pending);
+        doSort(parse("org.eclipse.che.ssh"), sorted, pending);
 
         return new ArrayList<>(sorted.values());
     }

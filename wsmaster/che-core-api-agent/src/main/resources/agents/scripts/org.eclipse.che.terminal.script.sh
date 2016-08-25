@@ -16,7 +16,7 @@ command -v curl >/dev/null 2>&1 || { PACKAGES=${PACKAGES}" curl"; }
 test "$(id -u)" = 0 || SUDO="sudo"
 
 CHE_DIR=$HOME/che
-AGENT_BINARIES_URI=file:///mnt/che/.tar.gz
+AGENT_BINARIES_URI="file:///mnt/che/terminal/websocket-terminal-\\${PREFIX}.tar.gz"
 LINUX_TYPE=$(cat /etc/os-release | grep ^ID= | tr '[:upper:]' '[:lower:]')
 LINUX_VERSION=$(cat /etc/os-release | grep ^VERSION=)
 MACHINE_TYPE=$(uname -m)
@@ -105,5 +105,5 @@ else
     exit 1
 fi
 
-curl -s  https://codenvy.com/update/repository/public/download/org.eclipse.che.terminal.binaries.${PREFIX} | tar  xzf - -C ${CHE_DIR}
+curl -s $(echo ${AGENT_BINARIES_URI} | sed -s 's/\\${PREFIX}/'${PREFIX}'/g') | tar  xzf - -C ${CHE_DIR}
 $HOME/che/terminal/che-websocket-terminal -addr :4411 -cmd /bin/bash -static $HOME/che/terminal/

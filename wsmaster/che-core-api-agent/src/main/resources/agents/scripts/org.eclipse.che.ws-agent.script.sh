@@ -94,7 +94,7 @@ fi
 export JAVA_HOME=${CHE_DIR}/jdk1.8.0_45
 command -v ${JAVA_HOME}/bin/java >/dev/null 2>&1 || {
     JDK_URL=http://download.oracle.com/otn-pub/java/jdk/8u45-b14/jdk-8u45-linux-x64.tar.gz
-    wget -qO - --no-cookies --no-check-certificate --header "Cookie: oraclelicense=accept-securebackup-cookie" "${JDK_URL}" | tar -C ${CHE_DIR} -xzf -
+    curl -s -j -k -L -H "Cookie: oraclelicense=accept-securebackup-cookie" "${JDK_URL}" | tar -C ${CHE_DIR} -xzf -
 }
 
 ########################
