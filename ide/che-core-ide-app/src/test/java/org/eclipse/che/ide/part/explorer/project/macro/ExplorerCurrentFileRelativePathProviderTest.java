@@ -34,7 +34,7 @@ public class ExplorerCurrentFileRelativePathProviderTest extends AbstractExplore
     @Before
     public void init() throws Exception {
         super.init();
-        provider = new ExplorerCurrentFileRelativePathProvider(projectExplorer, promiseProvider, appContext);
+        provider = new ExplorerCurrentFileRelativePathProvider(projectExplorer, promiseProvider);
     }
 
     @Test

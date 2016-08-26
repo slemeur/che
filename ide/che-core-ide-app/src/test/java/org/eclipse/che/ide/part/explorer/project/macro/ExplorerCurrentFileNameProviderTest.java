@@ -34,7 +34,7 @@ public class ExplorerCurrentFileNameProviderTest extends AbstractExplorerMacroPr
     @Before
     public void init() throws Exception {
         super.init();
-        provider = new ExplorerCurrentFileNameProvider(projectExplorer, promiseProvider, appContext);
+        provider = new ExplorerCurrentFileNameProvider(projectExplorer, promiseProvider);
     }
 
     @Test

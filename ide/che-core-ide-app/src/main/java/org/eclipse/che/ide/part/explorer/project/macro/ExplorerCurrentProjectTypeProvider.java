@@ -4,9 +4,9 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- *
+ * <p>
  * Contributors:
- *   Codenvy, S.A. - initial API and implementation
+ * Codenvy, S.A. - initial API and implementation
  *******************************************************************************/
 package org.eclipse.che.ide.part.explorer.project.macro;
 
@@ -17,8 +17,8 @@ import com.google.inject.Singleton;
 
 import org.eclipse.che.api.promises.client.Promise;
 import org.eclipse.che.api.promises.client.PromiseProvider;
-import org.eclipse.che.ide.api.app.AppContext;
 import org.eclipse.che.ide.api.data.tree.Node;
+import org.eclipse.che.ide.api.machine.CommandPropertyValueProvider;
 import org.eclipse.che.ide.api.resources.Project;
 import org.eclipse.che.ide.part.explorer.project.ProjectExplorerPresenter;
 import org.eclipse.che.ide.resources.tree.ResourceNode;
@@ -31,23 +31,23 @@ import java.util.List;
  * Macro provided: <code>${explorer.current.project.type}</code>
  *
  * @author Vlad Zhukovskyi
- * @see AbstractExplorerMacroProvider
+ * @see CommandPropertyValueProvider
  * @see ProjectExplorerPresenter
  * @since 4.7.0
  */
 @Beta
 @Singleton
-public class ExplorerCurrentProjectTypeProvider extends AbstractExplorerMacroProvider {
+public class ExplorerCurrentProjectTypeProvider implements CommandPropertyValueProvider {
 
     public static final String KEY = "${explorer.current.project.type}";
 
-    private PromiseProvider promises;
+    private ProjectExplorerPresenter projectExplorer;
+    private PromiseProvider          promises;
 
     @Inject
     public ExplorerCurrentProjectTypeProvider(ProjectExplorerPresenter projectExplorer,
-                                              PromiseProvider promises,
-                                              AppContext appContext) {
-        super(projectExplorer, appContext);
+                                              PromiseProvider promises) {
+        this.projectExplorer = projectExplorer;
         this.promises = promises;
     }
 
@@ -61,7 +61,7 @@ public class ExplorerCurrentProjectTypeProvider extends AbstractExplorerMacroPro
     @Override
     public Promise<String> getValue() {
 
-        List<Node> selectedNodes = getProjectExplorer().getTree().getSelectionModel().getSelectedNodes();
+        List<Node> selectedNodes = projectExplorer.getTree().getSelectionModel().getSelectedNodes();
 
         if (selectedNodes.isEmpty() || selectedNodes.size() > 1) {
             return promises.resolve("");

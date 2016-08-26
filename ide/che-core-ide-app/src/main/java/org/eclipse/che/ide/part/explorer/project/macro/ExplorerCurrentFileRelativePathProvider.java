@@ -4,26 +4,32 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- *
+ * <p>
  * Contributors:
- *   Codenvy, S.A. - initial API and implementation
+ * Codenvy, S.A. - initial API and implementation
  *******************************************************************************/
 package org.eclipse.che.ide.part.explorer.project.macro;
 
 import com.google.common.annotations.Beta;
+import com.google.common.base.Function;
 import com.google.common.base.Joiner;
+import com.google.common.base.Predicate;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
 import org.eclipse.che.api.promises.client.Promise;
 import org.eclipse.che.api.promises.client.PromiseProvider;
-import org.eclipse.che.ide.api.app.AppContext;
 import org.eclipse.che.ide.api.data.tree.Node;
+import org.eclipse.che.ide.api.machine.CommandPropertyValueProvider;
 import org.eclipse.che.ide.api.resources.Resource;
 import org.eclipse.che.ide.part.explorer.project.ProjectExplorerPresenter;
+import org.eclipse.che.ide.resources.tree.ResourceNode;
 
+import javax.annotation.Nullable;
 import java.util.List;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.base.Preconditions.checkState;
 import static com.google.common.collect.Iterables.filter;
 import static com.google.common.collect.Iterables.transform;
 
@@ -35,23 +41,53 @@ import static com.google.common.collect.Iterables.transform;
  * In case if project explorer has more than one selected file, comma separated file list is returned.
  *
  * @author Vlad Zhukovskyi
- * @see AbstractExplorerMacroProvider
+ * @see CommandPropertyValueProvider
  * @see ProjectExplorerPresenter
  * @since 4.7.0
  */
 @Beta
 @Singleton
-public class ExplorerCurrentFileRelativePathProvider extends AbstractExplorerMacroProvider {
+public class ExplorerCurrentFileRelativePathProvider implements CommandPropertyValueProvider {
 
     public static final String KEY = "${explorer.current.file.relpath}";
 
-    private PromiseProvider promises;
+    private Predicate<Node> resNodePredicate = new Predicate<Node>() {
+        @Override
+        public boolean apply(@Nullable Node input) {
+            checkNotNull(input);
+
+            return input instanceof ResourceNode;
+        }
+    };
+
+    private Function<Node, Resource> nodeToResourceFun = new Function<Node, Resource>() {
+        @Nullable
+        @Override
+        public Resource apply(@Nullable Node input) {
+            checkNotNull(input);
+            checkState(input instanceof ResourceNode);
+
+            return ((ResourceNode)input).getData();
+        }
+    };
+
+    private Function<Resource, String> resourceToPathFun = new Function<Resource, String>() {
+        @Nullable
+        @Override
+        public String apply(@Nullable Resource input) {
+            checkNotNull(input);
+
+            return input.getLocation().toString();
+        }
+    };
+
+    private ProjectExplorerPresenter projectExplorer;
+    private PromiseProvider          promises;
 
     @Inject
     public ExplorerCurrentFileRelativePathProvider(ProjectExplorerPresenter projectExplorer,
-                                                   PromiseProvider promises,
-                                                   AppContext appContext) {
-        super(projectExplorer, appContext);
+                                                   PromiseProvider promises) {
+        this.projectExplorer = projectExplorer;
         this.promises = promises;
     }
 
@@ -65,7 +101,7 @@ public class ExplorerCurrentFileRelativePathProvider extends AbstractExplorerMac
     @Override
     public Promise<String> getValue() {
 
-        List<Node> selectedNodes = getProjectExplorer().getTree().getSelectionModel().getSelectedNodes();
+        List<Node> selectedNodes = projectExplorer.getTree().getSelectionModel().getSelectedNodes();
 
         if (selectedNodes.isEmpty()) {
             return promises.resolve("");
