@@ -17,6 +17,7 @@ test "$(id -u)" = 0 || SUDO="sudo"
 
 CHE_DIR=$HOME/che
 AGENT_BINARIES_URI="file:///mnt/che/terminal/websocket-terminal-\\${PREFIX}.tar.gz"
+TARGET_AGENT_BINARIES_URI="file://"${CHE_DIR}"/websocket-terminal-\\${PREFIX}.tar.gz"
 LINUX_TYPE=$(cat /etc/os-release | grep ^ID= | tr '[:upper:]' '[:lower:]')
 LINUX_VERSION=$(cat /etc/os-release | grep ^VERSION=)
 MACHINE_TYPE=$(uname -m)
@@ -105,5 +106,9 @@ else
     exit 1
 fi
 
-curl -s $(echo ${AGENT_BINARIES_URI} | sed -s 's/\\${PREFIX}/'${PREFIX}'/g') | tar  xzf - -C ${CHE_DIR}
+if curl -o /dev/null --silent --head --fail $(echo ${AGENT_BINARIES_URI} | sed -s 's/\\${PREFIX}/'${PREFIX}'/g'); then
+    curl -o $(echo ${TARGET_AGENT_BINARIES_URI} | sed -s 's/\\${PREFIX}/'${PREFIX}'/g' | sed -s 's/file:\\/\\///g') -s $(echo ${AGENT_BINARIES_URI} | sed -s 's/\\${PREFIX}/'${PREFIX}'/g')
+fi
+
+curl -s $(echo ${TARGET_AGENT_BINARIES_URI} | sed -s 's/\\${PREFIX}/'${PREFIX}'/g') | tar  xzf - -C ${CHE_DIR}
 $HOME/che/terminal/che-websocket-terminal -addr :4411 -cmd /bin/bash -static $HOME/che/terminal/

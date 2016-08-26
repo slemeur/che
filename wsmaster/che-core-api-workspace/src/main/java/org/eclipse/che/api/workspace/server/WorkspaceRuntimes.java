@@ -577,7 +577,7 @@ public class WorkspaceRuntimes {
         }
 
         for (Agent agent : agents) {
-            LOG.info("Launching " + agent.getName());
+            LOG.info("Launching '{}' agent", agent.getName());
 
             AgentLauncher agentLauncher = agentLauncherFactory.find(agent.getName(), instance.getConfig().getType());
             agentLauncher.launch(instance, agent);
