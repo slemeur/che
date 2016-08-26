@@ -30,6 +30,9 @@ import java.util.Collections;
 
 import static org.mockito.Mockito.when;
 
+/**
+ * @author Vlad Zhukovskyi
+ */
 public class AbstractExplorerMacroProviderTest {
 
     public static final String FILE_1_NAME   = "file_1";

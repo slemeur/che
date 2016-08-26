@@ -24,6 +24,9 @@ import org.mockito.Mock;
 
 import static org.mockito.Mockito.when;
 
+/**
+ * @author Vlad Zhukovskyi
+ */
 public abstract class AbstractEditorMacroProviderTest {
 
     public static final String FILE_NAME     = "name";
