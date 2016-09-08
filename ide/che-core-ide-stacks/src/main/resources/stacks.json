@@ -1864,8 +1864,8 @@
     "tags": [
       "Ubuntu",
       "BitnamiRails",
-      "MariaDB"
-      "Ruby",
+      "MariaDB",
+      "Ruby"
     ],
     "components": [
       {
@@ -1875,7 +1875,8 @@
       {
         "name": "Ruby",
         "version": "2.3.1"
-      },      {
+      },      
+      {
         "name": "Rails",
         "version": "5.0.0.1"
       },
@@ -2137,7 +2138,7 @@
       {
         "name": "Activator",
         "version": "1.13.10"
-      }
+      },
       {
         "name": "Git",
         "version": "---"
