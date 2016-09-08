@@ -1617,6 +1617,18 @@
       {
         "name": "MongoDB",
         "version": "3.2.7"
+      },
+      {
+        "name": "Git",
+        "version": "---"
+      },
+      {
+        "name": "Nami",
+        "version": "0.0.3"
+      },
+      {
+        "name": "Tini",
+        "version": "0.9.0"
       }
     ],
     "source": {
@@ -1676,6 +1688,42 @@
       {
         "name": "Swift",
         "version": "3.0-PREVIEW-6"
+      },
+      {
+        "name": "JDK",
+        "version": "1.8.0_91"
+      },
+      {
+        "name": "Python",
+        "version": "2.7.12rc1"
+      },
+      {
+        "name": "CLANG",
+        "version": "---"
+      },
+      {
+        "name": "libxml2",
+        "version": "---"
+      },
+      {
+        "name": "libedit2",
+        "version": "---"
+      },
+      {
+        "name": "libicu52",
+        "version": "---"
+      },
+      {
+        "name": "Git",
+        "version": "---"
+      },
+      {
+        "name": "Nami",
+        "version": "0.0.3"
+      },
+      {
+        "name": "Tini",
+        "version": "0.9.0"
       }
     ],
     "source": {
@@ -1730,7 +1778,9 @@
     "tags": [
       "Ubuntu",
       "Node.JS",
-      "Laravel"
+      "Laravel",
+      "PHP",
+      "MariaDB"
     ],
     "components": [
       {
@@ -1744,6 +1794,22 @@
       {
         "name": "MariaDB",
         "version": "10.1.14"
+      },
+      {
+        "name": "Gulp",
+        "version": "---"
+      },
+      {
+        "name": "Git",
+        "version": "---"
+      },
+      {
+        "name": "Nami",
+        "version": "0.0.3"
+      },
+      {
+        "name": "Tini",
+        "version": "0.9.0"
       }
     ],
     "source": {
@@ -1797,7 +1863,9 @@
     "scope": "advanced",
     "tags": [
       "Ubuntu",
-      "BitnamiRails"
+      "BitnamiRails",
+      "MariaDB"
+      "Ruby",
     ],
     "components": [
       {
@@ -1807,10 +1875,25 @@
       {
         "name": "Ruby",
         "version": "2.3.1"
-      },
-      {
+      },      {
         "name": "Rails",
         "version": "5.0.0.1"
+      },
+      {
+        "name": "MySQL Client",
+        "version": "10.1.13"
+      },
+      {
+        "name": "Git",
+        "version": "---"
+      },
+      {
+        "name": "Nami",
+        "version": "0.0.3"
+      },
+      {
+        "name": "Tini",
+        "version": "0.9.0"
       }
     ],
     "source": {
@@ -1864,7 +1947,9 @@
     "scope": "advanced",
     "tags": [
       "Ubuntu",
-      "CodeIgniter"
+      "CodeIgniter",
+      "MariaDB",
+      "PHP"
     ],
     "components": [
       {
@@ -1878,6 +1963,22 @@
       {
         "name": "MariaDB",
         "version": "10.1.14"
+      },
+      {
+        "name": "MySQL Client",
+        "version": "10.1.13"
+      },
+      {
+        "name": "Git",
+        "version": "---"
+      },
+      {
+        "name": "Nami",
+        "version": "0.0.3"
+      },
+      {
+        "name": "Tini",
+        "version": "0.9.0"
       }
     ],
     "source": {
@@ -1931,7 +2032,9 @@
     "scope": "advanced",
     "tags": [
       "Ubuntu",
-      "Symfony"
+      "Symfony",
+      "PHP",
+      "MariaDB"
     ],
     "components": [
       {
@@ -1945,6 +2048,22 @@
       {
         "name": "MariaDB",
         "version": "10.1.14"
+      },
+      {
+        "name": "MySQL Client",
+        "version": "10.1.13"
+      },
+      {
+        "name": "Git",
+        "version": "---"
+      },
+      {
+        "name": "Nami",
+        "version": "0.0.3"
+      },
+      {
+        "name": "Tini",
+        "version": "0.9.0"
       }
     ],
     "source": {
@@ -1999,7 +2118,8 @@
     "tags": [
       "Ubuntu",
       "Activator",
-      "Play"
+      "Play",
+      "Java"
     ],
     "components": [
       {
@@ -2009,6 +2129,26 @@
       {
         "name": "Play",
         "version": "2.55"
+      },
+      {
+        "name": "Node",
+        "version": "6.4.0"
+      },
+      {
+        "name": "Activator",
+        "version": "1.13.10"
+      }
+      {
+        "name": "Git",
+        "version": "---"
+      },
+      {
+        "name": "Nami",
+        "version": "0.0.3"
+      },
+      {
+        "name": "Tini",
+        "version": "0.9.0"
       }
     ],
     "source": {
